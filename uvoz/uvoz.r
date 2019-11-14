@@ -52,4 +52,5 @@ druzine <- uvozi.druzine(levels(obcine$obcina))
 # potrebovali v 3. fazi, bi bilo smiselno funkcije dati v svojo
 # datoteko, tukaj pa bi klicali tiste, ki jih potrebujemo v
 # 2. fazi. Seveda bi morali ustrezno datoteko uvoziti v prihodnjih
-# fazah.
+# fazah..
+
