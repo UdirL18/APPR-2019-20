@@ -7,7 +7,7 @@ Repozitorij z gradivi pri predmetu APPR v študijskem letu 2019/20
 
 ## Analiza rezultatov RGI
 
-V projektni nalogi bom analizirala rezultate svetovnih pokalov v ritmični gimnastiki za induvidualne sestave. Osredotočila se bom na tekmovanja v letu 2019 in na najboljših 15 tekmovalk iz trenutnega olimpijskega cikla. Analizirala boom rezultate tako za posamične rekvizite (obroč, žoga, kiji, trak), kot tudi za skupni seštevek (all-rownd). Uporabila bom podatke iz spletne strani FIG (https://www.gymnastics.sport/site/events/searchresults.php), kjer so podatki v obliki HTML in CSV. 
+V projektni nalogi bom analizirala rezultate svetovnih pokalov v ritmični gimnastiki za induvidualne sestave. Osredotočila se bom na tekmovanja v letu 2019 in na najboljših 15 tekmovalk iz trenutnega olimpijskega cikla. Analizirala bom rezultate tako za posamične rekvizite (obroč, žoga, kiji, trak), kot tudi za skupni seštevek (all-rownd). Uporabila bom podatke iz spletne strani FIG (https://www.gymnastics.sport/site/events/searchresults.php), kjer so podatki v obliki HTML in CSV. 
 
 TABELE:
 1. tabela bo vsebovala rezultate iz svetovnih  pokalov (World Cup in World Challenge Cup).
