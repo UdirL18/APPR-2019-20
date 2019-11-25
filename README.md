@@ -5,10 +5,19 @@ Repozitorij z gradivi pri predmetu APPR v študijskem letu 2019/20
 * [![Shiny](http://mybinder.org/badge.svg)](http://mybinder.org/v2/gh/jaanos/APPR-2019-20/master?urlpath=shiny/APPR-2019-20/projekt.Rmd) Shiny
 * [![RStudio](http://mybinder.org/badge.svg)](http://mybinder.org/v2/gh/jaanos/APPR-2019-20/master?urlpath=rstudio) RStudio
 
-## Tematika
+## Analiza rezultatov RGI
 
-Izbrali si boste temo, s katero se bo vaš projekt ukvarjal.
-Tukaj boste napisali, kje ste dobili podatke, ter kakšen je vaš cilj.
+V projektni nalogi bom analizirala rezultate svetovnih pokalov v ritmični gimnastiki za induvidualne sestave. Osredotočila se bom na tekmovanja v letu 2019 in na najboljših 15 tekmovalk iz trenutnega olimpijskega cikla. Analizirala boom rezultate tako za posamične rekvizite (obroč, žoga, kiji, trak), kot tudi za skupni seštevek (all-rownd). Uporabila bom podatke iz spletne strani FIG (https://www.gymnastics.sport/site/events/searchresults.php), kjer so podatki v obliki HTML in CSV. 
+
+TABELE:
+1. tabela bo vsebovala rezultate iz svetovnih  pokalov (World Cup in World Challenge Cup).
+2. tabela bo vsebovala podrobno analizo ocen (difficulty and execution score) iz svetovnih prvenstev iz 2018 in 2019.
+
+Cilj projektne naloge je predstaviti pripravljenost posameznih tekmovalk na olimpijske igre 2020 in napovedati katera država bo verjetno osvojila odličja.
+
+
+
+
 
 ## Program
 
