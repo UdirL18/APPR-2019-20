@@ -11,23 +11,23 @@ V projektni nalogi bom analizirala rezultate svetovnih pokalov v ritmični gimna
 
 TABELE:
 1. TABELA bo vsebovala rezultate iz svetovnih  pokalov (World Cup in World Challenge Cup).
-  SPREMENLJIVKE: 
-  -ime in priimek tekmovalke
-  -država
-  -rezultat sestave z obročem
-  -rezultat sestave z žogo
-  -rezultat sestave z kiji
-  -rezultat sestave  z trakom
+  *SPREMENLJIVKE: 
+  *ime in priimek tekmovalke
+  *država
+  *rezultat sestave z obročem
+  *rezultat sestave z žogo
+  *rezultat sestave z kiji
+  *rezultat sestave  z trakom
   
 2. tabela bo vsebovala podrobno analizo ocen (difficulty and execution score) iz svetovnih prvenstev iz 2018 in 2019.
-  PREMENLJIVKE: 
-  -ime in priimek tekmovalke
-  -država
-  -DB (body difficulties) težine s telesom in plesni koraki, ter odbitek za odsotnos fundamentalnih gibanj z rekvizitom.
-  -DA (tehnical value) težine z rekvizitom in dinamični elementi z rotacijam.
-  -EA (artistic component) izvedba vaje na glasbo, uporaba tekmovalnega prostora, raznovrstnost elementov, izraznost.
-  -ET (tehnical faults) tehnične napake z rekvizitom in telesom.
-  -penalty odbitki-prestop ter glasba, dres in rekviziti niso v skaladu s pravilikom.
+ * SPREMENLJIVKE: 
+  *ime in priimek tekmovalke
+  *država
+  *DB (body difficulties) težine s telesom in plesni koraki, ter odbitek za odsotnos fundamentalnih gibanj z rekvizitom.
+  *DA (tehnical value) težine z rekvizitom in dinamični elementi z rotacijam.
+  *EA (artistic component) izvedba vaje na glasbo, uporaba tekmovalnega prostora, raznovrstnost elementov, izraznost.
+  *ET (tehnical faults) tehnične napake z rekvizitom in telesom.
+  *penalty odbitki-prestop ter glasba, dres in rekviziti niso v skaladu s pravilikom.
 
 Cilj projektne naloge je predstaviti pripravljenost posameznih tekmovalk na olimpijske igre 2020 in napovedati katera država bo verjetno osvojila odličja.
 
