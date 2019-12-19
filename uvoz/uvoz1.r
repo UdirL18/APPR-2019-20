@@ -9,7 +9,7 @@
 #x8 bi moral predstavljati skupno oceno, x9, x10 sta nepotrebna
 
 #str() tu vidimo kakšnega tipa so naši stolpci (vsiporebni stolpci so factor ampak to ni ok), potrebujemo:
-#x1=intiger, x2 in noc=character, ostali numeric
+#x1=intiger, x2 in noc=character, ostali numeric.
 
 library(dplyr)
 library(tidyr) #za funkciji gather() in spread()
