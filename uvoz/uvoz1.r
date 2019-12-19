@@ -45,8 +45,9 @@ baku_ribbon <- read_csv("baku_ribbon.csv",skip = 8, col_names = c("","","Tekmova
 #problem je le zadnji stolpec, v csvjih ni ,, če tekmovalka ni imela pen. 
 #in zato končna ocena tistih skoči v stolpec za pen
 
-#vidimo da bi vse to lahko združili v eno tabelo, zraven imena bi morali napisati še tekmo in rekvizit
+#vidimo da bi vse to lahko združili v eno tabelo, zraven imena bi morali napisati še tekmo in rekvizit.
 
 wcg <- rbind(baku_hoop, baku_ball, baku_clubs, baku_ribbon, sofia_hoop, sofia_ball, sofia_clubs, sofia_ribbon)
+View(wcg)
 
 
