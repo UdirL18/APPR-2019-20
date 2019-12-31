@@ -18,7 +18,7 @@ library(readr)
 sl <- locale("sl", decimal_mark=".", grouping_mark=";")
 
 sofia_hoop <- read_csv("sofia_hoop.csv",skip = 8, col_names = c("","","Tekmovalka", "","","Država","","", "DA", "DB","", "EA", "ET", "Pen.", ""),
-                       locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14))
+                       locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14)) %>% 
 
 sofia_ball <- read_csv("sofia_ball.csv",skip = 8, col_names = c("","","Tekmovalka", "","","Država","","", "DA", "DB","", "EA", "ET", "Pen.", ""),
                        locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14))
