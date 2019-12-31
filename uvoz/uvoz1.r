@@ -17,35 +17,61 @@ library(readr)
 
 sl <- locale("sl", decimal_mark=".", grouping_mark=";")
 
-sofia_hoop <- read_csv("sofia_hoop.csv",skip = 8, col_names = c("","","Tekmovalka", "","","Država","","", "DA", "DB","", "EA", "ET", "Pen.", ""),
-                       locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14)) %>% 
 
-sofia_ball <- read_csv("sofia_ball.csv",skip = 8, col_names = c("","","Tekmovalka", "","","Država","","", "DA", "DB","", "EA", "ET", "Pen.", ""),
-                       locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14))
+sofia_hoop<- read_csv("podatki/sofia_hoop.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
+colnames(sofia_hoop) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
 
-sofia_clubs <- read_csv("sofia_clubs.csv",skip = 8, col_names = c("","","Tekmovalka", "","","Država","","", "DA", "DB","", "EA", "ET", "Pen.", ""),
-                       locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14))
+  sofia_ball<- read_csv("podatki/sofia_ball.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
+colnames(sofia_ball) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
 
-sofia_ribbon <- read_csv("sofia_ribbon.csv",skip = 8, col_names = c("","","Tekmovalka", "","","Država","","", "DA", "DB","", "EA", "ET", "Pen.", ""),
-                       locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14))
+sofia_clubs<- read_csv("podatki/sofia_clubs.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
+colnames(sofia_clubs) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
 
-baku_hoop <- read_csv("baku_hoop.csv",skip = 8, col_names = c("","","Tekmovalka", "","","Država","","", "DA", "DB","", "EA", "ET", "Pen.", ""),
-                       locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14))
+sofia_ribbon<- read_csv("podatki/sofia_ribbon.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
+colnames(sofia_ribbon) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
 
-baku_ball <- read_csv("baku_ball.csv",skip = 8, col_names = c("","","Tekmovalka", "","","Država","","", "DA", "DB","", "EA", "ET", "Pen.", ""),
-                       locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14))
+baku_hoop<- read_csv("podatki/baku_hoop.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
+colnames(baku_hoop) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
 
-baku_clubs <- read_csv("baku_clubs.csv",skip = 8, col_names = c("","","Tekmovalka", "","","Država","","", "DA", "DB","", "EA", "ET", "Pen.", ""),
-                       locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14))
+baku_ball<- read_csv("podatki/baku_ball.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
+colnames(baku_ball) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
 
-baku_ribbon <- read_csv("baku_ribbon.csv",skip = 8, col_names = c("","","Tekmovalka", "","","Država","","", "DA", "DB","", "EA", "ET", "Pen.", ""),
-                       locale=locale(encoding="Windows-1250")) %>% select(c(3,6,9,10,12:14))
+baku_clubs<- read_csv("podatki/baku_clubs.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
+colnames(baku_clubs) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
+
+baku_ribbon<- read_csv("podatki/baku_ribbon.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
+colnames(baku_ribbon) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
+
+#vidimo da bi vse to lahko združili v eno tabelo, zraven imena bi morali napisati še tekmo in rekvizit.
+sofia_hoop$rekvizit<-"hoop" 
+sofia_hoop$tekma<-"Sofia"
+
+sofia_ball$rekvizit<-"ball" 
+sofia_ball$tekma<-"Sofia"
+
+sofia_clubs$rekvizit<-"clubs" 
+sofia_clubs$tekma<-"Sofia"
+
+sofia_ribbon$rekvizit<-"ribbon" 
+sofia_ribbon$tekma<-"Sofia"
+
+baku_hoop$rekvizit<-"hoop" 
+baku_hoop$tekma<-"baku"
+
+baku_ball$rekvizit<-"ball" 
+baku_ball$tekma<-"baku"
+
+baku_clubs$rekvizit<-"clubs" 
+baku_clubs$tekma<-"baku"
+
+baku_ribbon$rekvizit<-"ribbon" 
+baku_ribbon$tekma<-"baku"
 
 
 #problem je le zadnji stolpec, v csvjih ni ,, če tekmovalka ni imela pen. 
 #in zato končna ocena tistih skoči v stolpec za pen.
 
-#vidimo da bi vse to lahko združili v eno tabelo, zraven imena bi morali napisati še tekmo in rekvizit..
+
 
 wcg <- rbind(baku_hoop, baku_ball, baku_clubs, baku_ribbon, sofia_hoop, sofia_ball, sofia_clubs, sofia_ribbon)
 
