@@ -56,16 +56,16 @@ sofia_ribbon$rekvizit<-"ribbon"
 sofia_ribbon$tekma<-"Sofia"
 
 baku_hoop$rekvizit<-"hoop" 
-baku_hoop$tekma<-"baku"
+baku_hoop$tekma<-"Baku"
 
 baku_ball$rekvizit<-"ball" 
-baku_ball$tekma<-"baku"
+baku_ball$tekma<-"Baku"
 
 baku_clubs$rekvizit<-"clubs" 
-baku_clubs$tekma<-"baku"
+baku_clubs$tekma<-"Baku"
 
 baku_ribbon$rekvizit<-"ribbon" 
-baku_ribbon$tekma<-"baku"
+baku_ribbon$tekma<-"Baku"
 
 
 #problem je le zadnji stolpec, v csvjih ni ,, če tekmovalka ni imela pen. 

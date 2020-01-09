@@ -1,6 +1,6 @@
 ---
-title: "Poročilo pri predmetu Analiza podatkov s programom R"
-author: "Študent FMF"
+title: "Analiza rezultatov RGI"
+author: "Lucija Udir"
 output:
   html_document: default
   pdf_document:
@@ -26,7 +26,18 @@ source("lib/rstudio.r", encoding="UTF-8")
 
 # Izbira teme
 
-Za vzorec bomo prikazali nekaj podatkov o slovenskih občinah.
+Ideja projekta je analizirati rezultate svetovnih prvenstev v ritmični gimnastiki za induvidualne sestave. Primerjala bom ocene posameznih rekvizitov, kot tudi izvedbeno in težavnostno oceno med tekmovalkami.
+
+# Opis podatkov
+Viri posatkov:
+- podatki za svetovno prvenstvo v Bakuju:
+https://www.gymnastics.sport/site/events/results.php?idEvent=14845#filter
+
+- podatki za svetovno prvenstvo v Sofiji:
+https://www.gymnastics.sport/site/events/results.php?idEvent=13338
+
+Podatki so bili v pdf obliki. Najprej sem pdf datoteko pretvorila v csv datoteko in nato uvozila podatke. Neprečiščeni podatki so vsebovali tudi 10 stolpcev, ki so bili nepotrebni. Tip stolpcev je bil nepravilen. 
+
 
 ![](slike/grb.png)
 
@@ -38,26 +49,38 @@ Za vzorec bomo prikazali nekaj podatkov o slovenskih občinah.
 source("uvoz/uvoz.r", encoding="UTF-8")
 ```
 
-Uvozili smo podatke o občinah v obliki CSV s statističnega urada ter v obliki HTML
-z Wikipedije. Podatke imamo v dveh razpredelnicah v obliki *tidy data*.
+Uvozila sem podatke v obliki CSV s mednarodne gimnastične zveze. Podatki so bili v osmih tabelah, ki sem jih združila v eno razpredelnico v obliki *tidy data*.
 
-1. `druzine` - podatki o družinah za vsako občino
-  - `obcina` - spremenljivka: ime občine (neurejen faktor),
-  - `velikost.druzine` - spremenljivka: število otrok v družini (število: 1, 2, 3 ali 4, kjer zadnja vrednost pomeni 4 ali več),
-  - `stevilo.druzin` - meritev: število družin z ustreznim številom otrok v ustrezni občini (število).
+1. "Tekmovalka"
+  -stolpec z imenom in priimkom tekmovalke, tipa character.
 
-2. `obcine` - podatki o občinah
-  - `obcina` - spremenljivka: ime občine (neurejen faktor),
-  - `povrsina` - meritev: površina občine v km$^2$ (število),
-  - `prebivalci` - meritev: prebivalstvo občine (število),
-  - `gostota` - meritev: število prebivalcev na km$^2$ (število),
-  - `naselja` - meritev: število naselij v občini (število),
-  - `ustanovitev` - meritev: leto ustanovitve občine (število),
-  - `pokrajina` - meritev: pokrajina, ki ji občina pripada (neurejen faktor),
-  - `regija` - meritev: regija, ki ji občina pripada (neurejen faktor),
-  - `odcepitev` - meritev: podatki o občinah, od katerih se je občina odcepila (besedilo).
-
-**Opomba**: da bi razpredelnica `obcine` res bila v obliki *tidy data*, bi morali odstraniti stolpec `gostota` (saj je izpeljan iz stolpcev `povrsina` in `prebivalci`), podatke o pokrajinah pa bi morali premakniti v drugo razpredelnico, saj nekatere občine pripadajo dvema pokrajinama. Podobno bi morali narediti tudi s stolpcem `odcepitev`.
+2."drzava"
+  -stolpec z kratico države, ki jo tekomovalka zastopa, tipa character.
+  
+3."DA"
+  -stolpec z seštevkom tehničnih vrednostih z rekvizitom, tipa numeric.
+  
+4."BA"
+  -stolpec z seštevkom tehničnih vrednostih z telesom, tipa numeric. 
+  
+5."EA"
+  -stolpec z odbitkom kompozicijskih izvedbenih napak, tipa numeric.
+  
+6."ET"
+  -stolpec z odbitkom tehničnih izvedbenih napak, tipa numeric. 
+  
+7."Pen"
+  -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
+  
+8. "rekvizit"
+  -stolpec, ki pove s katerim rekvizitom je tekmovalka dobila te ocene, tipa character. Ta stolpec sem dodala ko sem     tabele združila ve eno.
+  
+9. "tekma"
+  -stolpec, ki pove na kateri tekmi je tekmovalka dobila te ocene, tipa character. Ta stolpec sem dodala ko sem tabele    združila ve eno.
+  
+**OPOMBA**: končna ocena je sestavlejena iz ocene težavnosti, odbitka izvedbenih napak in odbitkov s strani sodnice koordinatorke, časomerilke in linijskih sodnic. Ocena težavnosti je sestavljena iz dveh komponent (težine s telesom in težine z rekvizitom). Odbitek izvedbenih napak se odšteje od 10.00 točk in nato prišteje končni oceni.   
+  
+  
 
 Spodnji graf prikazuje porazdelitev števila naselij v občinah.
 
@@ -105,6 +128,6 @@ ggplot(inner_join(obcine, data.frame(obcina=names(skupine),
 
 ***
 
-```{r shiny, echo=FALSE}
-shinyAppDir("shiny", options=list(width="100%", height=600))
+#```{r shiny, echo=FALSE}
+#shinyAppDir("shiny", options=list(width="100%", height=600))
 ```
