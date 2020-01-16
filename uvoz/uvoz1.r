@@ -19,28 +19,28 @@ sl <- locale("sl", decimal_mark=".", grouping_mark=";")
 
 
 sofia_hoop<- read_csv("podatki/sofia_hoop.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
-colnames(sofia_hoop) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
+colnames(sofia_hoop) <- c("tekmovalka","drzava","DB", "DA", "EA", "ET", "Pen.")
 
   sofia_ball<- read_csv("podatki/sofia_ball.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
-colnames(sofia_ball) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
+colnames(sofia_ball) <- c("tekmovalka","drzava","DB", "DA", "EA", "ET", "Pen.")
 
 sofia_clubs<- read_csv("podatki/sofia_clubs.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
-colnames(sofia_clubs) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
+colnames(sofia_clubs) <- c("tekmovalka","drzava","DB", "DA", "EA", "ET", "Pen.")
 
 sofia_ribbon<- read_csv("podatki/sofia_ribbon.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
-colnames(sofia_ribbon) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
+colnames(sofia_ribbon) <- c("tekmovalka","drzava","DB", "DA", "EA", "ET", "Pen.")
 
 baku_hoop<- read_csv("podatki/baku_hoop.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
-colnames(baku_hoop) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
+colnames(baku_hoop) <- c("tekmovalka","drzava","DB", "DA", "EA", "ET", "Pen.")
 
 baku_ball<- read_csv("podatki/baku_ball.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
-colnames(baku_ball) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
+colnames(baku_ball) <- c("tekmovalka","drzava","DB", "DA", "EA", "ET", "Pen.")
 
 baku_clubs<- read_csv("podatki/baku_clubs.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
-colnames(baku_clubs) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
+colnames(baku_clubs) <- c("tekmovalka","drzava","DB", "DA", "EA", "ET", "Pen.")
 
 baku_ribbon<- read_csv("podatki/baku_ribbon.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
-colnames(baku_ribbon) <- c("tekmovalka","drzava","DA", "DB", "EA", "ET", "Pen.")
+colnames(baku_ribbon) <- c("tekmovalka","drzava","DB", "DA", "EA", "ET", "Pen.")
 
 #vidimo da bi vse to lahko združili v eno tabelo, zraven imena bi morali napisati še tekmo in rekvizit.
 sofia_hoop$rekvizit<-"hoop" 
@@ -75,8 +75,9 @@ baku_ribbon$tekma<-"Baku"
 library(naniar)
 wcg <- rbind(baku_hoop, baku_ball, baku_clubs, baku_ribbon, sofia_hoop, sofia_ball, sofia_clubs, sofia_ribbon) %>% replace_with_na_at(.vars = c("Pen."), condition = ~.x >= 0)%>%replace_na(wcg, "0") 
 
-#wcg[ ,Pen.][is.na(data[ , Pen.] ) ] = 0
 wcg[is.na(wcg)] = 0
+
+#ne vem zakaj mi v tabeli zamenja imena stolpcov
 
 
 
