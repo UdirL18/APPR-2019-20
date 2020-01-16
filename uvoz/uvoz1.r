@@ -73,11 +73,11 @@ baku_ribbon$tekma<-"Baku"
 
 
 library(naniar)
-wcg <- rbind(baku_hoop, baku_ball, baku_clubs, baku_ribbon, sofia_hoop, sofia_ball, sofia_clubs, sofia_ribbon) %>% replace_with_na_at(.vars = c("Pen."), condition = ~.x >= 0)%>%replace_na(wcg, "0") 
+wcg <- rbind(baku_hoop, baku_ball, baku_clubs, baku_ribbon, sofia_hoop, sofia_ball, sofia_clubs, sofia_ribbon) %>% replace_with_na_at(.vars = c("Pen."), condition = ~.x >= 0) 
 
 wcg[is.na(wcg)] = 0
 
-#ne vem zakaj mi v tabeli zamenja imena stolpcov
+
 
 
 
