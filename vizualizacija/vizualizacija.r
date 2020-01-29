@@ -10,29 +10,100 @@ library(reshape2)
 library(ggplot2)
 library(tidyverse)
 
+# Uvozimo funkcije za pobiranje in uvoz zemljevida.
+#source('lib/uvozi.zemljevid.r')
+#source('lib/libraries.r', encoding = 'UTF-8')
+
+#==========================================================================================================================
 #graf ki prikazuje koliko ima kakšna tekmovalka točk pri težinah z rekvizitom, 
 #problem je da ne vemo kater rekvizit je to-barvamo
-graf.AD <- ggplot(data = wcg) + 
-  geom_point(mapping = aes(x = tekmovalka, y = DA, color = rekvizit)) + ggtitle("vrednosti težin z rekvizitom")
+#graf.AD <- ggplot(data = wcg) + 
+ # geom_point(mapping = aes(x = tekmovalka, y = DA, color = rekvizit)) + ggtitle("vrednosti težin z rekvizitom")
+#View(graf.AD)
+#======================================================================================================
+library(tidyverse)
+library(rvest)
+library(magrittr)
+library(ggmap)
+library(stringr)
+library(dplyr)
 
-#uvozimo zemljevid sveta
-zemljevid <- uvozi.zemljevid("https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/cultural/ne_50m_admin_0_countries.zip",
-                             
-                             "ne_50m_admin_0_countries",mapa="./zemljevidi") %>% fortify()
+#==============
+#ZEMLEVID SVETA
+#==============
+
+map.world <- map_data("world")
+
+#===========================================
+# SPREMEMBA IMEN DRŽAV
+# - imena v wcg data niso enaka kot v map.world
+# - moramo jih preimenovati
+#===========================================
+
+# KATRE DRŽAVE IMAMO V WCG
+as.factor(wcg$drzava) %>% levels()
+
+# PREIMENOVANJE DRŽAV
+wcg$drzava <- recode(wcg$drzava 
+                     ,'BUL' = 'Bulgaria'
+                     ,'GEO' = 'Georgia'
+                     ,'ISR' = 'Israel'
+                     ,'ITA' = 'Italy'
+                     ,'JPN' = 'Japan'
+                     ,'RUS' = 'Russia'
+                     ,'UKR' = 'Ukraine'
+                     ,'USA' = 'USA'
+                     ,'BLR' = 'Belarus'
+                     
+)
+
+# PREVERIM ALI SEM USPEŠNO ZAMENJALA IMENA =)
+print(wcg)
+
+#================================
+# ZDRUŽITEV
+# - združio wcg data 
+#   in world map
+#================================
+#head(map.world)
 
 
+# LEFT JOIN- že v wcg ni te države bo ohranil podatke iz map.world
+map.world_joined <- left_join(map.world, wcg, by = c('region' = 'drzava'))
+
+#===================================================
+# INDIKATOR
+# - v zemljevidu, bomo poudarili
+#   države, ki so imeli tekmovalke v finalih 
+# svetovnih prvenstev.
+# - ustvarili bom indikator, ki bo povedal 
+#ali želim obarvati določeno državo 
+#če je v tabeli map.world_joined v stolpcu tekma NA 
+#potem države ne bomo obarvali
+#===================================================
+
+map.world_joined <- map.world_joined %>% mutate(fill_flg = ifelse(is.na(tekma),F,T))
+head(map.world_joined)
 
 
+#==========
+# ZEMLJEVID
+#==========
 
+ggplot() +
+  geom_polygon(data = map.world_joined, aes(x = long, y = lat, group = group, fill = fill_flg)) +
+  scale_fill_manual(values = c("#CCCCCC","#e60000")) +
+  labs(title = 'DRŽAVE S TEKMOVALKAMI V FINALIH SVETOVNIH PRVENSTEV') +
+  theme(panel.background = element_rect(fill = "#444444")
+        ,plot.background = element_rect(fill = "#444444")
+        ,panel.grid = element_blank()
+        ,plot.title = element_text(size = 15)
+        ,axis.text = element_blank()
+        ,axis.title = element_blank()
+        ,axis.ticks = element_blank()
+        ,legend.position = "none"
+  )
 
-# Uvozimo zemljevid.
-#zemljevid <- uvozi.zemljevid("http://baza.fmf.uni-lj.si/OB.zip", "OB",
-                           #  pot.zemljevida="OB", encoding="Windows-1250")
-#levels(zemljevid$OB_UIME) <- levels(zemljevid$OB_UIME) %>%
- # { gsub("Slovenskih", "Slov.", .) } %>% { gsub("-", " - ", .) }
-#zemljevid$OB_UIME <- factor(zemljevid$OB_UIME, levels=levels(obcine$obcina))
-#zemljevid <- fortify(zemljevid)
-
-# Izračunamo povprečno velikost družine
-#povprecja <- druzine %>% group_by(obcina) %>%
-  #summarise(povprecje=sum(velikost.druzine * stevilo.druzin) / sum(stevilo.druzin))
+#=================================================================================================
+#dobila sem zemljevid, ki prikazuje katere države so bile zastopane v finalih svetovnega prvestva.
+#=================================================================================================
