@@ -14,12 +14,15 @@ library(tidyverse)
 #source('lib/uvozi.zemljevid.r')
 #source('lib/libraries.r', encoding = 'UTF-8')
 
+#==================================================================================================================
+#GRAFI
 #==========================================================================================================================
 #graf ki prikazuje koliko ima kakšna tekmovalka točk pri težinah z rekvizitom, 
 #problem je da ne vemo kater rekvizit je to-barvamo
-#graf.AD <- ggplot(data = wcg) + 
- # geom_point(mapping = aes(x = tekmovalka, y = DA, color = rekvizit)) + ggtitle("vrednosti težin z rekvizitom")
-#View(graf.AD)
+graf.AD <- ggplot(data = wcg) + 
+geom_point(mapping = aes(x = tekmovalka, y = DA, color = rekvizit)) + ggtitle("vrednosti težin z rekvizitom")
+View(graf.AD)
+
 #======================================================================================================
 library(tidyverse)
 library(rvest)
@@ -157,28 +160,15 @@ ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
 #===========================================================================================
 ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
   geom_polygon(aes(color = as.factor(fill_flg), fill = skupna_ocena.x)) +
-  scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = NA))
-
-#=====================
-# KONČNI ZEMLJEVID
-#=====================
-
-ggplot(map.oil, aes( x = long, y = lat, group = group )) +
-  geom_polygon(aes(fill = oil_bbl_per_day, color = as.factor(opec_ind))) +
-  scale_fill_gradientn(colours = c('#461863','#404E88','#2A8A8C','#7FD157','#F9E53F')
-                       ,values = scales::rescale(c(100,96581,822675,3190373,10000000))
-                       ,labels = comma
-                       ,breaks = c(100,96581,822675,3190373,10000000)
-  ) +
+  scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = NA)
+   )+
   guides(fill = guide_legend(reverse = T)) +
-  labs(fill = 'Barrels per day\n2016'
-       ,color = 'OPEC Countries'
-       ,title = 'OPEC countries produce roughly 44% of world oil'
+  labs(fill = 'skupna ocena'
+       ,color = 'najvišja ocena'
+       ,title = 'DRŽAVE Z NAJVIŠJO OCENO V FINALIH'
        ,x = NULL
        ,y = NULL) +
-  theme(text = element_text(family = 'Gill Sans', color = '#EEEEEE')
-        ,plot.title = element_text(size = 28)
-        ,plot.subtitle = element_text(size = 14)
+  theme(plot.title = element_text(size = 20)
         ,axis.ticks = element_blank()
         ,axis.text = element_blank()
         ,panel.grid = element_blank()
@@ -189,11 +179,11 @@ ggplot(map.oil, aes( x = long, y = lat, group = group )) +
         ,legend.key = element_blank()
   ) +
   annotate(geom = 'text'
-           ,label = 'Source: U.S. Energy Information Administration\nhttps://en.wikipedia.org/wiki/List_of_countries_by_oil_production\nhttps://en.wikipedia.org/wiki/OPEC'
+           ,label = 'Source: FIG https://www.gymnastics.sport/site/events/searchresults.php#filter'
            ,x = 18, y = -55
            ,size = 3
            ,family = 'Gill Sans'
            ,color = '#CCCCCC'
            ,hjust = 'left'
   ) +
-  scale_color_manual(values = c('1' = 'orange', '0' = NA), labels = c('1' = 'OPEC'), breaks = c('1'))
+  scale_color_manual(values = c('TRUE' = 'orange', 'FALSE' = NA), labels = c('TRUE' = 'najvišja ocena'), breaks = c('1'))
