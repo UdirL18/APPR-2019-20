@@ -14,15 +14,6 @@ library(tidyverse)
 #source('lib/uvozi.zemljevid.r')
 #source('lib/libraries.r', encoding = 'UTF-8')
 
-#==================================================================================================================
-#GRAFI
-#==========================================================================================================================
-#graf ki prikazuje koliko ima kakšna tekmovalka točk pri težinah z rekvizitom, 
-#problem je da ne vemo kater rekvizit je to-barvamo
-graf.AD <- ggplot(data = wcg) + 
-geom_point(mapping = aes(x = tekmovalka, y = DA, color = rekvizit)) + ggtitle("vrednosti težin z rekvizitom")
-View(graf.AD)
-
 #======================================================================================================
 library(tidyverse)
 library(rvest)
@@ -158,7 +149,7 @@ ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
 #============================================================================================
 #oba zemljevida skupaj
 #===========================================================================================
-ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
+zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
   geom_polygon(aes(color = as.factor(fill_flg), fill = skupna_ocena.x)) +
   scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = NA)
    )+
@@ -187,3 +178,23 @@ ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
            ,hjust = 'left'
   ) +
   scale_color_manual(values = c('TRUE' = 'orange', 'FALSE' = NA), labels = c('TRUE' = 'najvišja ocena'), breaks = c('1'))
+
+#==================================================================================================================
+#GRAFI
+#==========================================================================================================================
+#graf ki prikazuje koliko ima kakšna tekmovalka točk pri težinah z rekvizitom, 
+#problem je da ne vemo kater rekvizit je to-barvamo, tekmo-shape
+
+graf_AD <- ggplot(data = wcg, mapping = aes(x = DA, y = tekmovalka, color = rekvizit, shape  = tekma)) + geom_point()+
+  ggtitle("vrednosti težin z rekvizitom")+ labs(x="vrednosti AD", y="tekmovalke") + facet_wrap( ~ rekvizit, ncol=8)
+print(graf_AD)
+#graf, ki prikazuje pri katerem rekvizitu tekmovalke dobijo največji odbitek za izvedbo
+wcg$skupna_ocena_tezin = rowSums(wcg[,c(3,4)])
+wcg$skupni_odbitek_izvedbe = rowSums(wcg[,c(5,6)])
+wcg$skupni_odbitek_odstet = wcg[,11] + 10
+wcg$skupna_ocena = rowSums(wcg[,c(7,10,12)])
+
+E <- barplot(data=wcg, mapping=aes(X=rekvizit, Y=skupni_odbitek_odstet, color= tekmovalka), main = 'Izvedba',xlab = 'rekvizit', horiz = FALSE)
+print(E)
+histogram_AD <- hist(wcg$DA)
+plot(wcg$DA, xlab = 'AD vrednosti', ylab = 'vrednosti', main = 'AD', col = 'green')
