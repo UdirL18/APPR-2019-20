@@ -26,7 +26,7 @@ library(dplyr)
 #ZEMLEVID SVETA
 #==============
 
-map.world <- map_data("world")
+map.world <- map_data("world", xlim=c(-100,100),ylim=c(20,100)) #potrebujem le ta del zemljevida saj v južnem delu ni nobene države s tekmovalko v finlih
 
 #===========================================
 # SPREMEMBA IMEN DRŽAV
@@ -155,7 +155,7 @@ zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long.x, y = la
    )+
   guides(fill = guide_legend(reverse = T)) +
   labs(fill = 'skupna ocena'
-       ,color = 'najvišja ocena'
+       ,color = 'najvišja ocena '
        ,title = 'DRŽAVE Z NAJVIŠJO OCENO V FINALIH'
        ,x = NULL
        ,y = NULL) +
@@ -165,19 +165,20 @@ zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long.x, y = la
         ,panel.grid = element_blank()
         ,panel.background = element_rect(fill = '#333333')
         ,plot.background = element_rect(fill = '#333333')
-        ,legend.position = c(.18,.36)
+        ,legend.position = c(.10,.500)
         ,legend.background = element_blank()
         ,legend.key = element_blank()
   ) +
   annotate(geom = 'text'
            ,label = 'Source: FIG https://www.gymnastics.sport/site/events/searchresults.php#filter'
-           ,x = 18, y = -55
+           ,x = 18, y = 100
            ,size = 3
            ,family = 'Gill Sans'
            ,color = '#CCCCCC'
            ,hjust = 'left'
-  ) +
-  scale_color_manual(values = c('TRUE' = 'orange', 'FALSE' = NA), labels = c('TRUE' = 'najvišja ocena'), breaks = c('1'))
+  ) 
+print(zemljevid_najvisjih_ocen)
+
 
 #==================================================================================================================
 #GRAFI
@@ -198,3 +199,4 @@ E <- barplot(data=wcg, mapping=aes(X=rekvizit, Y=skupni_odbitek_odstet, color= t
 print(E)
 histogram_AD <- hist(wcg$DA)
 plot(wcg$DA, xlab = 'AD vrednosti', ylab = 'vrednosti', main = 'AD', col = 'green')
+
