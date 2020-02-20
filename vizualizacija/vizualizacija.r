@@ -187,3 +187,4 @@ ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
            ,hjust = 'left'
   ) +
   scale_color_manual(values = c('TRUE' = 'orange', 'FALSE' = NA), labels = c('TRUE' = 'najvišja ocena'), breaks = c('1'))
+
