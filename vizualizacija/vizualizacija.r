@@ -14,15 +14,6 @@ library(tidyverse)
 #source('lib/uvozi.zemljevid.r')
 #source('lib/libraries.r', encoding = 'UTF-8')
 
-#==================================================================================================================
-#GRAFI
-#==========================================================================================================================
-#graf ki prikazuje koliko ima kakšna tekmovalka točk pri težinah z rekvizitom, 
-#problem je da ne vemo kater rekvizit je to-barvamo
-graf.AD <- ggplot(data = wcg) + 
-geom_point(mapping = aes(x = tekmovalka, y = DA, color = rekvizit)) + ggtitle("vrednosti težin z rekvizitom")
-View(graf.AD)
-
 #======================================================================================================
 library(tidyverse)
 library(rvest)
@@ -35,7 +26,7 @@ library(dplyr)
 #ZEMLEVID SVETA
 #==============
 
-map.world <- map_data("world")
+map.world <- map_data("world", xlim=c(-100,100),ylim=c(20,100)) #potrebujem le ta del zemljevida saj v južnem delu ni nobene države s tekmovalko v finlih
 
 #===========================================
 # SPREMEMBA IMEN DRŽAV
@@ -43,8 +34,6 @@ map.world <- map_data("world")
 # - moramo jih preimenovati
 #===========================================
 
-# KATRE DRŽAVE IMAMO V WCG
-as.factor(wcg$drzava) %>% levels()
 
 # PREIMENOVANJE DRŽAV
 wcg$drzava <- recode(wcg$drzava 
@@ -158,33 +147,90 @@ ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
 #============================================================================================
 #oba zemljevida skupaj
 #===========================================================================================
-ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
+zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
   geom_polygon(aes(color = as.factor(fill_flg), fill = skupna_ocena.x)) +
-  scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = NA)
+  scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = 'black')
    )+
   guides(fill = guide_legend(reverse = T)) +
   labs(fill = 'skupna ocena'
-       ,color = 'najvišja ocena'
+       ,color = 'najvišja ocena '
        ,title = 'DRŽAVE Z NAJVIŠJO OCENO V FINALIH'
        ,x = NULL
        ,y = NULL) +
-  theme(plot.title = element_text(size = 20)
+  theme(plot.title = element_text(size = 20, hjust = 0.5, colour = 'azure3' )
         ,axis.ticks = element_blank()
         ,axis.text = element_blank()
         ,panel.grid = element_blank()
         ,panel.background = element_rect(fill = '#333333')
         ,plot.background = element_rect(fill = '#333333')
-        ,legend.position = c(.18,.36)
+        ,legend.position = c(.05,.500)
         ,legend.background = element_blank()
-        ,legend.key = element_blank()
+        ,legend.key = element_rect(fill = 'azure3')
+        ,legend.text = element_text(color = 'azure3')
+        ,legend.title = element_text(color = 'azure3', size = 10)
   ) +
   annotate(geom = 'text'
            ,label = 'Source: FIG https://www.gymnastics.sport/site/events/searchresults.php#filter'
-           ,x = 18, y = -55
+           ,x = 18, y = 100
            ,size = 3
            ,family = 'Gill Sans'
            ,color = '#CCCCCC'
            ,hjust = 'left'
-  ) +
-  scale_color_manual(values = c('TRUE' = 'orange', 'FALSE' = NA), labels = c('TRUE' = 'najvišja ocena'), breaks = c('1'))
+  ) 
+print(zemljevid_najvisjih_ocen)
 
+#==================================================================================================================
+#GRAFI
+#==========================================================================================================================
+#graf ki prikazuje koliko ima kakšna tekmovalka točk pri težinah z rekvizitom, 
+#problem je da ne vemo kater rekvizit je to-barvamo, tekmo-shape
+
+graf_AD <- ggplot(data = wcg, mapping = aes(x = DA, y = tekmovalka, color = rekvizit, shape  = tekma)) + geom_point()+
+  ggtitle("vrednosti težin z rekvizitom")+ labs(x="vrednosti AD", y="tekmovalke") + facet_wrap( ~ rekvizit, ncol=8)
+print(graf_AD)
+#graf, ki prikazuje pri katerem rekvizitu tekmovalke dobijo največji odbitek za izvedbo
+wcg$skupna_ocena_tezin = rowSums(wcg[,c(3,4)])
+wcg$skupni_odbitek_izvedbe = rowSums(wcg[,c(5,6)])
+wcg$skupni_odbitek_odstet = wcg[,11] + 10
+wcg$skupna_ocena = rowSums(wcg[,c(7,10,12)])
+
+E <- barplot(data=wcg, mapping=aes(X=rekvizit, Y=skupni_odbitek_odstet, color= tekmovalka), main = 'Izvedba',xlab = 'rekvizit', horiz = FALSE)
+print(E)
+histogram_AD <- hist(wcg$DA)
+plot(wcg$DA, xlab = 'AD vrednosti', ylab = 'vrednosti', main = 'AD', col = 'green')
+
+#===================================================================================================
+#ZEMLJEVIDU ŽELIM DODATI IMENA DRŽAV OBARVANIH Z MODRO #https://rpubs.com/EmilOWK/209498
+#===================================================================================================
+#install.packages("choroplethrAdmin1")
+#install.packages("choroplethr")
+#install.packages("psych")
+
+#library(choroplethrAdmin1)
+#library(choroplethr)
+#library(ggplot2)
+#library(grid)
+#library(stringr)
+#library(magrittr)
+#library(psych)
+
+#katere države imamo
+#as.factor(map.world_joined_max$region) %>% levels()
+
+#preiimenovanje držav
+#map.world_joined_max$region <- recode(map.world_joined_max$region
+ #                    ,'Bulgaria' = 'BUL'
+  #                   ,'Georgia' = 'GEO'
+   #                  ,'Israel' = 'ISR'
+    #                 ,'Italy' = 'ITA'
+     #                ,'Japan' = 'JPN'
+      #               ,'Russia' = 'RUS'
+       #              ,'Ukraine' = 'UKR'
+      #               ,'Belarus' ='BLR')
+#map.world_joined_max$region
+
+#admin1_choropleth(country.name = "bulgaria", 
+ #                 df           = map.world_joined_max$region, 
+  #                legend       = "Random uniform data", 
+   #               num_colors   = 1) +
+  #geom_text(data = d_geo, aes(long, lat, label = clean_names, group = NULL), size = 2.5)
