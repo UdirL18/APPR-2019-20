@@ -28,6 +28,11 @@
 #model <- lm(skupna_ocena ~., data = wcg2)
 #model
 
+# Prepare Data
+#wcg3 =  wcg[,c('tekmovalka','DB', 'DA')]
+#wcg3 <- na.omit(wcg) # listwise deletion of missing
+#wcg3 <- scale(wcg3) # standardize variables
+
 
 
 
