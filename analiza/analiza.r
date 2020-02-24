@@ -33,6 +33,21 @@
 #wcg3 <- na.omit(wcg) # listwise deletion of missing
 #wcg3 <- scale(wcg3) # standardize variables
 
+#=============================================================================================
+#CLUSTER
+#==============================================================================================
+#PODATKI
+wcg$skupna_ocena_tezin = rowSums(wcg[,c(3,4)])
+wcg$skupni_odbitek_izvedbe = rowSums(wcg[,c(5,6)])
+wcg$skupni_odbitek_odstet = wcg[,11] + 10
+wcg$skupna_ocena = rowSums(wcg[,c(7,10,12)])
 
+wcg3 <- data.frame(wcg$tekmovalka, wcg$DB, wcg$DA)
+colnames(wcg3) <- c("tekmovalka","DB", "DA")
+print(wcg3)
+wcg3$DA <- as.numeric(as.character(wcg3$DA))
+
+wcg3 <- scale(wcg3$DB)
+wcg3 <- scale(wcg3$DA)
 
 
