@@ -37,17 +37,42 @@
 #CLUSTER
 #==============================================================================================
 #PODATKI
+#______________________________________________________________________________________________
 wcg$skupna_ocena_tezin = rowSums(wcg[,c(3,4)])
 wcg$skupni_odbitek_izvedbe = rowSums(wcg[,c(5,6)])
 wcg$skupni_odbitek_odstet = wcg[,11] + 10
 wcg$skupna_ocena = rowSums(wcg[,c(7,10,12)])
 
-wcg3 <- data.frame(wcg$tekmovalka, wcg$DB, wcg$DA)
-colnames(wcg3) <- c("tekmovalka","DB", "DA")
+wcg3 <- data.frame(wcg$tekmovalka, wcg$DB, wcg$DA, wcg$rekvizit)
+colnames(wcg3) <- c("tekmovalka","DB", "DA", "rekvizit")
 print(wcg3)
-wcg3$DA <- as.numeric(as.character(wcg3$DA))
+str(wcg3)
 
-wcg3 <- scale(wcg3$DB)
-wcg3 <- scale(wcg3$DA)
+#podatki ne vsebujejo NA vrednosti DB in DA sta načeloma obe med 0 in neskončno
+#rada bi dala v skupine tekmovalke, ki imajo v povprečju višjo oceno za težine s telesom in tiste, ki imajo višjo oceno z rekvizitim
 
+#________________________________________________________________________________________________
+#KNJIŽNICE
+#_____________________________________________________________________________________________
+install.packages("factoextra")
+install.packages("cluster")
+install.packages("magrittr")
 
+library("cluster")
+library("factoextra")
+library("magrittr")
+
+#_______________________________________________________________________________________________
+
+#razlika <- get_dist(wcg3$DB, stand = TRUE, method = "pearson")
+#https://www.datanovia.com/en/blog/types-of-clustering-methods-overview-and-quick-start-r-code/
+
+#_____________________________________________________________________________________________
+#k-MEANS
+#____________________________________________________________________________________________
+
+wss <- (nrow(wcg3)-1)*sum(apply(wcg3,2,var))
+for (i in 2:15) wss[i] <- sum(kmeans(mydata,
+                                     centers=i)$withinss)
+plot(1:15, wss, type="b", xlab="Number of Clusters",
+     ylab="Within groups sum of squares")
