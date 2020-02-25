@@ -33,6 +33,9 @@
 #wcg3 <- na.omit(wcg) # listwise deletion of missing
 #wcg3 <- scale(wcg3) # standardize variables
 
+
+
+
 #=============================================================================================
 #CLUSTER
 #==============================================================================================
@@ -47,6 +50,10 @@ wcg3 <- data.frame(wcg$tekmovalka, wcg$DB, wcg$DA, wcg$rekvizit)
 colnames(wcg3) <- c("tekmovalka","DB", "DA", "rekvizit")
 print(wcg3)
 str(wcg3)
+
+
+
+wcg3 <- na.omit(wcg3) %>% mutate_if(is.numeric, scale)
 
 #podatki ne vsebujejo NA vrednosti DB in DA sta načeloma obe med 0 in neskončno
 #rada bi dala v skupine tekmovalke, ki imajo v povprečju višjo oceno za težine s telesom in tiste, ki imajo višjo oceno z rekvizitim
@@ -70,9 +77,17 @@ library("magrittr")
 #_____________________________________________________________________________________________
 #k-MEANS
 #____________________________________________________________________________________________
+#določimo stevilo clustersov
+#apply(data,MARGIN=1`: the manipulation is performed on rows, MARGIN=2`: the manipulation is performed on columns
+#MARGIN=c(1,2)` the manipulation is performed on rows and columns, katera funkcija )
+#var je neka varijanca
 
-wss <- (nrow(wcg3)-1)*sum(apply(wcg3,2,var))
-for (i in 2:15) wss[i] <- sum(kmeans(mydata,
-                                     centers=i)$withinss)
-plot(1:15, wss, type="b", xlab="Number of Clusters",
+#še ne vem kaj pomeni i in 2:15...
+#whithinss= v razredredu vsot kvadratov
+#kmeans(data, koliko centrov zgostitve, )
+#kmeans(wcg3,centers=i)$withinss je nek objekt na katerem naredimo vsoto
+
+wss <- (nrow(wcg3)-1)*sum(apply(wcg3,2,var))  
+for (i in 2:3) wss[i] <- sum(kmeans(wcg3,centers=i)$withinss)
+plot(2:3, wss, type="b", xlab="Number of Clusters",
      ylab="Within groups sum of squares")
