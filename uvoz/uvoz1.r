@@ -1,3 +1,8 @@
+#UvOZ PODATKOV
+#=============================================================================================================
+#UVOZ CSV DATOTEK - INDUVIDUVALNE SESTAVE
+#=============================================================================================================
+
 #naložili smo data, z >class(sofia_hoop) smo preverili da je res data.frame 
 #(dvodimenzionalna tabela iz vrstic in stolpcev, vsak stolpec je enega tipa),
 #z dim(sofia_ ) preverimo število vrstic 14 in št stolpcev 17,
@@ -11,11 +16,19 @@
 #str() tu vidimo kakšnega tipa so naši stolpci (vsiporebni stolpci so factor ampak to ni ok), potrebujemo:
 #x1=intiger, x2 in noc=character, ostali numeric.
 
+#===========================================================================================================
+#KNJIŽNICE
+#===========================================================================================================
 library(dplyr)
 library(tidyr) #za funkciji gather() in spread()
 library(readr)
+library(naniar)
 
-sl <- locale("sl", decimal_mark=".", grouping_mark=";")
+
+#==============================================================================================================
+#BRANJE IZ EXCELA
+#==============================================================================================================
+sl <- locale("sl", decimal_mark=".", grouping_mark=";") 
 
 
 sofia_hoop<- read_csv("podatki/sofia_hoop.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
@@ -68,14 +81,23 @@ baku_ribbon$rekvizit<-"ribbon"
 baku_ribbon$tekma<-"Baku"
 
 
-#problem je le zadnji stolpec, v csvjih ni ,, če tekmovalka ni imela pen. 
-#in zato končna ocena tistih skoči v stolpec za pen.
 
 
-library(naniar)
-wcg <- rbind(baku_hoop, baku_ball, baku_clubs, baku_ribbon, sofia_hoop, sofia_ball, sofia_clubs, sofia_ribbon) %>% replace_with_na_at(.vars = c("Pen."), condition = ~.x >= 0) 
+# uporabimo knjižnico library(naniar), replace_with_na_at nadomesti spremenljivke z NA če je dosežen pogoj
+# .vars = na katerem stolpcu uporabimo zamenjavo, 
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!kaj je ~.x
+wcg <- rbind(baku_hoop, baku_ball, baku_clubs, baku_ribbon, sofia_hoop, sofia_ball, sofia_clubs, sofia_ribbon) %>% 
+  replace_with_na_at(.vars = c("Pen."), condition = ~.x >= 0) 
 
+#preuredimo še vrstni red stolpcev
+wcg <- wcg[c('tekmovalka', 'drzava', 'tekma', 'rekvizit', 'DB', 'DA', 'EA', 'ET', 'Pen.')]
+  
+
+#v stolpcu pen. nekatere tekmovalke "nimajo podatka" v resnici le niso dobile odbitka zato te na nastavimo na 0
 wcg[is.na(wcg)] = 0
+View(wcg)
+
+
 
 
 
