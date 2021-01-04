@@ -30,7 +30,7 @@ tabela_baku_skupinske %>%
   replace_na(list(Pen. = 0)) %>% #NA v stolpcu Pen. spremenim v 0
   select(-1) %>% #izbrišem prvi stolpec(uvrstitev) ker to lahko izračunamo sami
   mutate(rekvizit = "5 žog") %>%
-  mutate(tekma = "Baku") -> tabela_baku_skupinske_zoge
+  mutate(tekma = "2019 Baku") -> tabela_baku_skupinske_zoge
   #View() %>%
   #sapply(class) # rank:integer, drzava: caracter, E: num, D num, pen.:num, total:num 
 
@@ -46,7 +46,7 @@ tabela_baku_skupinske %>%
   replace_na(list(Pen. = 0)) %>% #NA v stolpcu Pen. spremenim v 0
   select(-1) %>% #izbrišem prvi stolpec(uvrstitev) ker to lahko izračunamo sami
   mutate(rekvizit = "3 obroči + 4 kiji") %>%
-  mutate(tekma = "Baku") -> tabela_baku_skupinske_kiji_obroci 
+  mutate(tekma = "2019 Baku") -> tabela_baku_skupinske_kiji_obroci 
   #View() %>%
   #sapply(class) # rank:integer, drzava: caracter, E: num, D num, pen.:num, total:num 
 
@@ -56,7 +56,7 @@ tabela_baku_skupinske %>%
 #SKUPNA TABELA
 #------------------------------------------------------------------------------------------------------------------
 wcg_baku_skupinske <- rbind(tabela_baku_skupinske_kiji_obroci, tabela_baku_skupinske_zoge)
-View(wcg_baku_skupinske)
+#View(wcg_baku_skupinske)
 
 
 
@@ -71,7 +71,7 @@ kijev_zoge <-
 kijev_zoge %>% 
   rename(drzava = 1, E = 2, D = 3, Pen.= 4, koncna_ocena = 5) %>% #preimenujemo stolpce
   mutate(rekvizit = "5 žog") %>% #dodamo dva stolpca
-  mutate(tekma = "Kijev") -> kijev_zoge
+  mutate(tekma = "2020 Kijev") -> kijev_zoge
 
 
 
@@ -82,14 +82,14 @@ kijev_kiji_obroci <-
 kijev_kiji_obroci %>% 
   rename(drzava = 1, E = 2, D = 3, Pen.= 4, koncna_ocena = 5) %>% #preimenujemo stolpce
   mutate(rekvizit = "3 obroči + 4 kiji") %>% #dodamo dva stolpca
-  mutate(tekma = "Kijev") -> kijev_kiji_obroci 
+  mutate(tekma = "2020 Kijev") -> kijev_kiji_obroci 
 
 
 
 #SKUPNA TABELA
 #------------------------------------------------------------------------------------------------------------------
 ecg_kijev_skupinske <- rbind(kijev_kiji_obroci, kijev_zoge)
-View(ecg_kijev_skupinske)
+#View(ecg_kijev_skupinske)
 
 
 
