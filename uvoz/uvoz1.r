@@ -90,48 +90,48 @@ colnames(kijev_ribbon) <- c("tekmovalka","drzava","E", "D", "Pen.", "koncna_ocen
 #SOFIA
 #-------------------------------------------------------------------------------------------------------------
 sofia_hoop$rekvizit<-"hoop" 
-sofia_hoop$tekma<-"Sofia"
+sofia_hoop$tekma<-"2018 Sofia"
 
 sofia_ball$rekvizit<-"ball" 
-sofia_ball$tekma<-"Sofia"
+sofia_ball$tekma<-"2018 Sofia"
 
 sofia_clubs$rekvizit<-"clubs" 
-sofia_clubs$tekma<-"Sofia"
+sofia_clubs$tekma<-"2018 Sofia"
 
 sofia_ribbon$rekvizit<-"ribbon" 
-sofia_ribbon$tekma<-"Sofia"
+sofia_ribbon$tekma<-"2018 Sofia"
 
 
 
 #BAKU
 #------------------------------------------------------------------------------------------------------------
 baku_hoop$rekvizit<-"hoop" 
-baku_hoop$tekma<-"Baku"
+baku_hoop$tekma<-"2019 Baku"
 
 baku_ball$rekvizit<-"ball" 
-baku_ball$tekma<-"Baku"
+baku_ball$tekma<-"2019 Baku"
 
 baku_clubs$rekvizit<-"clubs" 
-baku_clubs$tekma<-"Baku"
+baku_clubs$tekma<-"2019 Baku"
 
 baku_ribbon$rekvizit<-"ribbon" 
-baku_ribbon$tekma<-"Baku"
+baku_ribbon$tekma<-"2019 Baku"
 
 
 
 #KIJEV
 #-------------------------------------------------------------------------------------------------------------
 kijev_hoop$rekvizit<-"hoop" 
-kijev_hoop$tekma<-"Kijev"
+kijev_hoop$tekma<-"2020 Kijev"
 
 kijev_ball$rekvizit<-"ball" 
-kijev_ball$tekma<-"Kijev"
+kijev_ball$tekma<-"2020 Kijev"
 
 kijev_clubs$rekvizit<-"clubs" 
-kijev_clubs$tekma<-"Kijev"
+kijev_clubs$tekma<-"2020 Kijev"
 
 kijev_ribbon$rekvizit<-"ribbon" 
-kijev_ribbon$tekma<-"Kijev"
+kijev_ribbon$tekma<-"2020 Kijev"
 
 
 #=============================================================================================================
@@ -149,7 +149,7 @@ wcg <- wcg[c('tekmovalka', 'drzava', 'tekma', 'rekvizit', 'DB', 'DA', 'EA', 'ET'
 
 #v stolpcu pen. nekatere tekmovalke "nimajo podatka" v resnici le niso dobile odbitka zato te na nastavimo na 0
 wcg[is.na(wcg)] = 0
-View(wcg)
+#View(wcg)
 
 
 
@@ -161,7 +161,7 @@ ecg <- rbind(kijev_hoop, kijev_ball, kijev_clubs, kijev_ribbon)
 #preuredimo še vrstni red stolpcev
 ecg <- ecg[c('tekmovalka', 'drzava', 'tekma', 'rekvizit', 'E', 'D', 'Pen.', 'koncna_ocena')]
 
-View(ecg)
+#View(ecg)
 
 
 
@@ -174,8 +174,19 @@ wcg_D_E$E <- wcg_D_E$EA + wcg_D_E$ET
 wcg_D_E$D <- wcg_D_E$DB + wcg_D_E$DA
 wcg_D_E$koncna_ocena <- wcg_D_E$D + 10 + wcg_D_E$E + wcg_D_E$Pen.
 wcg_D_E <- wcg_D_E[c('tekmovalka', 'drzava', 'tekma', 'rekvizit', 'E', 'D', 'Pen.', 'koncna_ocena')]
-View(wcg_D_E)
+#View(wcg_D_E)
 
 induvidualne <- rbind(ecg, wcg_D_E)
 View(induvidualne)
 
+#===============================================================================================
+#SAMO "FINALISTKE"
+#===============================================================================================
+finali_kijev <- ecg %>%
+  group_by(tekma) %>%
+  group_by(rekvizit) %>% 
+  slice(c(1,2,3,4,5,6,7,8)) %>% #vemo da so podatki urejeni, tako da samo vzamemo prvih 8 ocen
+  ungroup() 
+
+induvidualne_finali <- rbind(finali_kijev, wcg_D_E)
+View(induvidualne_finali)
