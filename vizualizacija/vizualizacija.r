@@ -1,236 +1,322 @@
-# 3. faza: Vizualizacija podatkov
-
-library(rgdal)
-library(rgeos)
-library(mosaic)
-library(maptools)
-library(munsell)
-library(StatMeasures)
+################################################################################################################
+#3. FAZA: VIZUALIZACIJA PODATKOV - GRAFI
+################################################################################################################
+require(ggplot2)
+require(dplyr)
+library(tidyverse) #mutate
 library(reshape2)
-library(ggplot2)
-library(tidyverse)
-
-# Uvozimo funkcije za pobiranje in uvoz zemljevida.
-#source('lib/uvozi.zemljevid.r')
-#source('lib/libraries.r', encoding = 'UTF-8')
-
-#======================================================================================================
-library(tidyverse)
-library(rvest)
-library(magrittr)
-library(ggmap)
-library(stringr)
-library(dplyr)
-
-#==============
-#ZEMLEVID SVETA
-#==============
-
-map.world <- map_data("world", xlim=c(-100,100),ylim=c(20,100)) #potrebujem le ta del zemljevida saj v južnem delu ni nobene države s tekmovalko v finlih
-
-#===========================================
-# SPREMEMBA IMEN DRŽAV
-# - imena v wcg data niso enaka kot v map.world
-# - moramo jih preimenovati
-#===========================================
+library(scales) #izračun deleža
+library(wesanderson) #barva grafa
 
 
-# PREIMENOVANJE DRŽAV
-wcg$drzava <- recode(wcg$drzava 
-                     ,'BUL' = 'Bulgaria'
-                     ,'GEO' = 'Georgia'
-                     ,'ISR' = 'Israel'
-                     ,'ITA' = 'Italy'
-                     ,'JPN' = 'Japan'
-                     ,'RUS' = 'Russia'
-                     ,'UKR' = 'Ukraine'
-                     ,'USA' = 'USA'
-                     ,'BLR' = 'Belarus'
-                     
+#=============================================================================================================
+#1. KAKO SE JE SKOZI OLIMPISKI CIKEL SPREMINJALA VREDNOST OCEN (SKUPNE IN D). 
+#______________________________________________________________________________________________________________
+#iz vsake tekme bom izbrala 10 najvišjih ocen (neglede na rekvizit), 
+#primerjala D s končno oceno (za 5. najvišjo oceno-prikaz na grafu), 
+#izračunala medijano in povprečno vrednost za vsako tekmo.
+#----------------------------------------------------------------------------
+
+
+#---------------------------------------------------------------------------
+#PRIPRAVA PODATKOV
+#----------------------------------------------------------------------------
+induvidualne_viz <- induvidualne #da ne bi kaj pokvarili v prvotni tabeli
+
+
+induvidualne_viz %>% 
+  #----------------------------------------------------------------------------
+  #izracunamo koliko % ocene predstavlja D
+  #----------------------------------------------------------------------------
+   add_column(delez =percent(induvidualne_viz$D/induvidualne_viz$koncna_ocena, accuracy = 0.01))%>%
+  #----------------------------------------------------------------------------
+  #izberemo 10 najboljših za vsako tekmo 
+  #---------------------------------------------------------------------------
+   group_by(tekma) %>%
+   top_n(10, koncna_ocena) %>%
+   arrange(desc(koncna_ocena)) %>% #desc uredi od najvišje do najnižje ocene
+   select(-c(tekmovalka, drzava, E, Pen.)) %>% #te stolpci nas ne bodo zanimali
+   mutate(ranking = 1:10)-> induvidualne_viz 
+#View(induvidualne_viz)
+
+
+#---------------------------------------------------------------------------
+#PRIPRAVA PODATKOV ZA graf1
+#---------------------------------------------------------------------------
+
+# V dat SHRANIMO STOLPCE KI JIH BOMO POTREBOVALI PRI TEJ ANALIZI
+#--------------------------------------------------------------------------
+dat <- data.frame(
+  D = induvidualne_viz$D,
+  koncna_ocena = induvidualne_viz$koncna_ocena,
+  ranking = as.factor(induvidualne_viz$ranking),
+  tekma = as.factor(induvidualne_viz$tekma)
 )
 
-# PREVERIM ALI SEM USPEŠNO ZAMENJALA IMENA =)
-print(wcg)
 
-#================================
-# ZDRUŽITEV
-# - združio wcg data 
-#   in world map
-#================================
-#head(map.world)
-
-
-# LEFT JOIN- če v wcg ni te države bo ohranil podatke iz map.world
-map.world_joined <- left_join(map.world, wcg, by = c('region' = 'drzava'))
-
-#===================================================
-# INDIKATOR
-# - v zemljevidu, bomo poudarili
-#   države, ki so imeli tekmovalke v finalih 
-# svetovnih prvenstev.
-# - ustvarili bom indikator, ki bo povedal 
-#ali želim obarvati določeno državo 
-#če je v tabeli map.world_joined v stolpcu tekma NA 
-#potem države ne bomo obarvali
-#===================================================
-
-map.world_joined <- map.world_joined %>% mutate(fill_flg = ifelse(is.na(tekma),F,T))
-head(map.world_joined)
+#POVPREČJE
+#----------------------------------------------------------------------------
+dat %>%
+  group_by(tekma)%>% 
+  summarise(D=mean(D), koncna_ocena =mean(koncna_ocena))%>%
+  gather("Stat", "Value",-tekma) %>%
+  add_column(ranking = "povprečje")-> dat_mean
+#View(dat_mean)
 
 
-#==========
-# ZEMLJEVID
-#==========
-
-ggplot() +
-  geom_polygon(data = map.world_joined, aes(x = long, y = lat, group = group, fill = fill_flg)) +
-  scale_fill_manual(values = c("#CCCCCC","#e60000")) +
-  labs(title = 'DRŽAVE S TEKMOVALKAMI V FINALIH SVETOVNIH PRVENSTEV') +
-  theme(panel.background = element_rect(fill = "#444444")
-        ,plot.background = element_rect(fill = "#444444")
-        ,panel.grid = element_blank()
-        ,plot.title = element_text(size = 15)
-        ,axis.text = element_blank()
-        ,axis.title = element_blank()
-        ,axis.ticks = element_blank()
-        ,legend.position = "none"
-  )
-
-#=================================================================================================
-#dobila sem zemljevid, ki prikazuje katere države so bile zastopane v finalih svetovnega prvestva.
-#=================================================================================================
-
-#=================================================================================================
-#zemljevid ki obarva države glede na končno oceno
-#===================================================================================
-#države bi radi obarvali glede na končne ocene
-map.world_joined$skupna_ocena_tezin = rowSums(map.world_joined[,c(8,9)])
-map.world_joined$skupni_odbitek_izvedbe = rowSums(map.world_joined[,c(10,11)])
-map.world_joined$skupni_odbitek_odstet = map.world_joined[,17] + 10
-map.world_joined$skupna_ocena = rowSums(map.world_joined[,c(12,16,18)])
+#MEDIANA
+#----------------------------------------------------------------------------
+dat %>%
+  group_by(tekma)%>% 
+  summarise(D=median(D), koncna_ocena=median(koncna_ocena))%>%
+  gather("Stat", "Value", -tekma) %>%
+  add_column(ranking = "mediana")-> dat_mediana
+#View(dat_mediana)
 
 
-ggplot(map.world_joined, aes( x = long, y = lat, group = group )) +
-  geom_polygon(aes(fill = skupna_ocena))
-
-#===================================================================================
-#zemljevid najvišje ocene
-#===================================================================================
-#da bomo bolje videli katera država ima najvišjo oceno za posamezen rekvizit bom tiste države obkrožila, 
-#to bo verjetno vse Rusija
-#rada bi dodala stolpec true fase, če je max ocena za rekvizit true drugače false
-max(map.world_joined$skupna_ocena, na.rm = TRUE) 
-vrstice_hoop <- map.world_joined[grep("hoop",map.world_joined$rekvizit),]
-vrstice_ball <- map.world_joined[grep("ball",map.world_joined$rekvizit),]
-vrstice_clubs <- map.world_joined[grep("clubs",map.world_joined$rekvizit),]
-vrstice_ribbon <- map.world_joined[grep("ribbon",map.world_joined$rekvizit),]
-max(vrstice_hoop$skupna_ocena, na.rm = TRUE)
-
-which.max(vrstice_hoop$skupna_ocena)
-which.max(vrstice_ball$skupna_ocena)
-which.max(vrstice_clubs$skupna_ocena)
-which.max(vrstice_ribbon$skupna_ocena)
-
-max_ocena <- rbind(vrstice_hoop[2802, ],vrstice_ball[2977, ],vrstice_clubs[2898, ],vrstice_ribbon[4253, ])
-max_ocena$najvisja_ocena <- "TRUE"
-
-#združimo data
-map.world_joined_max <- left_join(map.world_joined, max_ocena, by = c('region' = 'region'))
-
-map.world_joined_max <- map.world_joined_max %>% mutate(fill_flg = ifelse(is.na(najvisja_ocena),F,T))
+#V dat_D SHRANIMO SPREMENJENO dat NUMERIČNE STOLPCE DAMO V ENEGA, 
+#DODAMO NOV STOLPEC stat Z VREDNOSTJO D IN koncna_ocena
+#-----------------------------------------------------------------------------
+dat_D <- dat %>%
+  gather("Stat", "Value", -ranking, -tekma)
+#View(dat_D)
 
 
-ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
-  geom_polygon(aes(color = as.factor(fill_flg))) +
-  scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = NA))
+#ZDRUŽIMO TABELE
+#-----------------------------------------------------------------------------
+dat_graf1 <- rbind(dat_D, dat_mean, dat_mediana)
+View(dat_graf1)
 
-#============================================================================================
-#oba zemljevida skupaj
-#===========================================================================================
-zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
-  geom_polygon(aes(color = as.factor(fill_flg), fill = skupna_ocena.x)) +
-  scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = 'black')
-   )+
-  guides(fill = guide_legend(reverse = T)) +
-  labs(fill = 'skupna ocena'
-       ,color = 'najvišja ocena '
-       ,title = 'DRŽAVE Z NAJVIŠJO OCENO V FINALIH'
-       ,x = NULL
-       ,y = NULL) +
-  theme(plot.title = element_text(size = 20, hjust = 0.5, colour = 'azure3' )
-        ,axis.ticks = element_blank()
-        ,axis.text = element_blank()
-        ,panel.grid = element_blank()
-        ,panel.background = element_rect(fill = '#333333')
-        ,plot.background = element_rect(fill = '#333333')
-        ,legend.position = c(.05,.500)
-        ,legend.background = element_blank()
-        ,legend.key = element_rect(fill = 'azure3')
-        ,legend.text = element_text(color = 'azure3')
-        ,legend.title = element_text(color = 'azure3', size = 10)
-  ) +
-  annotate(geom = 'text'
-           ,label = 'Source: FIG https://www.gymnastics.sport/site/events/searchresults.php#filter'
-           ,x = 18, y = 100
-           ,size = 3
-           ,family = 'Gill Sans'
-           ,color = '#CCCCCC'
-           ,hjust = 'left'
-  ) 
-print(zemljevid_najvisjih_ocen)
+value <- dat_graf1$Value
+#------------------------------------------------------------------------------
+#GRAF  !!!!!mal še polepšaj-kul bi blo če bi se pojavila vrednost ko dašz miško na en bar
+#------------------------------------------------------------------------------
+graf1 <- ggplot(dat_graf1, aes(x = ranking, y = Value, fill = Stat)) +
+  geom_col(position = "dodge") +
+  #------------------------------------------------------------
+  #DEKORACIJA LEGENDE
+  #------------------------------------------------------------
+  scale_fill_manual(values=c("slateblue2","lightpink"),  #!!!!!!!!!!niso mi ok barve
+                    labels = c("D", "KONČNA OCENA")
+                    )+
+  #legend("topright", legend = c("D", "KONCNA OCENA"), cex = 0.75)+
+  #--------------------------------------------------------
+  #SKALA NA Y OSI
+  #--------------------------------------------------------
+  #scale_y_continuous(breaks=dat_D$Value)+ #preveč natlačen
+  #scale_y_continuous(breaks=c(10:26))+
+  #---------------------------------------------------------
+  #NASLOV, TEXT NA OSEH
+  #---------------------------------------------------------
+  ggtitle("DVIG OCEN SKOZI OLIMPIJSKI CIKEL 2017 - 2021")+
+  #xlab("Najvišje ocenjene sestave") +
+  ylab("ocena")+
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  geom_text(aes(label = value, #navpična vrednost na grafu
+                angle = 90, 
+                vjust = 0.25, 
+                hjust=1, 
+                #color = "white",
+                ))+
+  #--------------------------------------------------------
+  #TRIJE GRAFKI
+  #--------------------------------------------------------
+  facet_grid(.~tekma)+
+  #--------------------------------------------------------
+  #OZADJE-da se znebimo sivega ozadja
+  #--------------------------------------------------------
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), #mislim da je bolje da sedaj ni vodoravnih črt
+        strip.background = element_blank(),
+        panel.border = element_blank(),
+        #----------------------------------------------------------------------
+        #NAPISI PRI X OSI, IZBRIS Y OSI 
+        #----------------------------------------------------------------------
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        axis.title.x = element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(), #izbris črtic na oseh
+        #----------------------------------------------------------------------
+        #NASLOV GRAFA NA SREDINI
+        #----------------------------------------------------------------------
+        plot.title = element_text(hjust=0.5),
+        #----------------------------------------------------------------------
+        #DEKORACIJA LEGENDE
+        #----------------------------------------------------------------------
+        legend.justification = c("left", "top"),
+        legend.position = "top",
+        legend.key.size = unit(0.25, 'cm'),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 6, colour = "black"))
+
+print(graf1)
+
+
+
+
+
+#------------------------------------------------------------------------------
+#GRAF2-delž D v končni oceni za 5. najvišjo oceno
+#------------------------------------------------------------------------------
+#!!!!!! ne vem še kako bi to pogazala če sploh
+#=================================================================================
+#IDK WHAT THIS IS
+#===============================================================================
+induvidualne_5 <- induvidualne_viz#[c(5,15,25),]
+induvidualne_5 %>%
+  select(-c(rekvizit, D, koncna_ocena, ranking)) ->induvidualne_graf2#%>%
+  #table() 
+View(induvidualne_graf2)
+
+#kr neki
+ggplot(induvidualne_graf2[c(5,15,25),], aes(x=tekma, y=delez)) +
+  geom_bar()
+
+#kr neki na kvadrat
+plot(induvidualne_graf2$tekma, induvidualne_graf2$delez, type = "b", pch = 19, 
+     col = "red", xlab = "x", ylab = "y")
+
+
+#okej sam se nič ne vidi
+#----------------------------------------------------------------------------
+bp<- ggplot(induvidualne_graf2, aes(x="", y="", fill=delez))+
+  geom_bar(width = 1, stat = "identity")
+bp
+
+pie <- bp +
+  coord_polar("y", start=0)+
+  facet_grid(.~tekma)
+pie
+
+#----------------------------------------------------------------------------
+#lbls <- induvidualne_graf2$delez
+#pie(induvidualne_graf2, labels = lbls,
+#    main="Delež ocene D")
+
+
+
+
+
+
+
+
+
+
+#=============================================================================================================
+#2. KAKO SE JE SKOZI OLIMPISKI CIKEL SPREMINJALA VREDNOST DA (APPARATUS DIFFICULTY) IN KOLIKO JE ZARADI TEGA MANJ
+#POMEMBNA VREDNOST DB (BODY DIFFICULTY).
+#______________________________________________________________________________________________________________
+#primerjam DA in DE za tekmovalko Linoy Ashram za vsako vajo in
+#(predikcija kakšen bo DA na olimpijskih.)
+
+
+
+
 
 #==================================================================================================================
-#GRAFI
-#==========================================================================================================================
+#3. GRAF VREDNOSTI TEŽIN Z REKVIZITOM (2018,2019)
+#__________________________________________________________________________________________________________________
 #graf ki prikazuje koliko ima kakšna tekmovalka točk pri težinah z rekvizitom, 
 #problem je da ne vemo kater rekvizit je to-barvamo, tekmo-shape
 
-graf_AD <- ggplot(data = wcg, mapping = aes(x = DA, y = tekmovalka, color = rekvizit, shape  = tekma)) + geom_point()+
-  ggtitle("vrednosti težin z rekvizitom")+ labs(x="vrednosti AD", y="tekmovalke") + facet_wrap( ~ rekvizit, ncol=8)
-print(graf_AD)
-#graf, ki prikazuje pri katerem rekvizitu tekmovalke dobijo največji odbitek za izvedbo
-wcg$skupna_ocena_tezin = rowSums(wcg[,c(3,4)])
-wcg$skupni_odbitek_izvedbe = rowSums(wcg[,c(5,6)])
-wcg$skupni_odbitek_odstet = wcg[,11] + 10
-wcg$skupna_ocena = rowSums(wcg[,c(7,10,12)])
+graf3 <- ggplot(data = wcg, mapping = aes(x = DA, y = tekmovalka, color = rekvizit, shape  = tekma)) +
+  geom_point()+
+  ggtitle("vrednosti težin z rekvizitom")+ 
+  labs(x="vrednosti AD", y="tekmovalke") + 
+  facet_wrap( ~ rekvizit, ncol=8)
 
-E <- barplot(data=wcg, mapping=aes(X=rekvizit, Y=skupni_odbitek_odstet, color= tekmovalka), main = 'Izvedba',xlab = 'rekvizit', horiz = FALSE)
-print(E)
-histogram_AD <- hist(wcg$DA)
-plot(wcg$DA, xlab = 'AD vrednosti', ylab = 'vrednosti', main = 'AD', col = 'green')
+print(graf3)
+
+
+
+#======================================================================================================
+#4. PRI KATEREM REKVIZITU TEKMOVALKE DOBIJO NAJVEČJI ODBITEK ZA IZVEDBO?
+#______________________________________________________________________________________________________
+#------------------------------------------------------------------------------------------------------
+#PRIPRAVA PODATKOV
+#------------------------------------------------------------------------------------------------------
+#iz tabele induvidualne_finali iberemo max, min (GLEDE NA E), mediano in povprečje
+#neglede na tekmo, za vsak rekvizit posebaj
+induvidualne_E <- induv_zemljevid_finali # da ne povarimo tabele
+
+#najboljši E
+#--------------------------
+max_E <- induvidualne_E %>%
+  group_by(rekvizit) %>%
+  summarise(Value = max(E)) %>%
+  add_column(nacin = "max")
+
+#najslabši E
+#--------------------------
+min_E <- induvidualne_E %>%
+  group_by(rekvizit) %>%
+  summarise(Value = min(E))%>%
+  add_column(nacin = "min")
+
+#mediana E
+#-------------------------
+me_E <- induvidualne_E %>%
+  group_by(rekvizit)%>% 
+  summarise(Value = median(E))%>%
+  add_column(nacin = "mediana")
+
+#povprečje E
+#-------------------------
+av_E <- induvidualne_E %>%
+  group_by(rekvizit)%>% 
+  summarise(Value = mean(E))%>%
+  add_column(nacin = "povprečje")
+
+#združimo
+#--------------------------
+induv_graf4 <- rbind(max_E, min_E, me_E, av_E)
+#View(induv_graf4) #!!!preveč decimalk
+
+#------------------------------------------------------------------------------------------------------
+#GRAF
+#------------------------------------------------------------------------------------------------------
+graf4 <- ggplot(induv_graf4, aes(x=nacin, y=Value)) +
+  #------------------------------------------------------------------------
+  #LOLIPOP
+  #------------------------------------------------------------------------
+  geom_segment( aes(x=nacin, xend=nacin, y=0, yend=Value), color="grey") +
+  geom_point( size=7.5, color=alpha("orange", 0.3), fill=alpha("orange", 0.3), alpha=0.7, shape=21, stroke=2)+
+  #-----------------------------------------------------------------------
+  #IZPIS VREDNOSTI
+  #--------------------------------------------------------------------------
+  geom_text(aes(label = round(Value,2), #navpična vrednost na grafu
+                angle = 90, 
+                vjust = 0.25, 
+                hjust=0.5, 
+  ),size = 2.5)+
+  #--------------------------------------------------------------------------
+  #DEKORACIJA
+  #--------------------------------------------------------------------------
+  theme_light() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5, size = 8),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+  ) +
+  xlab("") +
+  ylab("vrednost izvedbenega odbitka E")+
+  #---------------------------------------------------------------------------
+  #GRAFKI ZA VSAK REKVIZIT
+  #---------------------------------------------------------------------------
+  facet_grid(.~rekvizit)
+
+
+print(graf4)
+#!!!!!!!!!!!ni mi ok napisi max, min, povprečje, mediana
+
+
+
+
 
 #===================================================================================================
-#ZEMLJEVIDU ŽELIM DODATI IMENA DRŽAV OBARVANIH Z MODRO #https://rpubs.com/EmilOWK/209498
-#===================================================================================================
-#install.packages("choroplethrAdmin1")
-#install.packages("choroplethr")
-#install.packages("psych")
+#5. SKUPINSKE VAJE
 
-#library(choroplethrAdmin1)
-#library(choroplethr)
-#library(ggplot2)
-#library(grid)
-#library(stringr)
-#library(magrittr)
-#library(psych)
-
-#katere države imamo
-#as.factor(map.world_joined_max$region) %>% levels()
-
-#preiimenovanje držav
-#map.world_joined_max$region <- recode(map.world_joined_max$region
- #                    ,'Bulgaria' = 'BUL'
-  #                   ,'Georgia' = 'GEO'
-   #                  ,'Israel' = 'ISR'
-    #                 ,'Italy' = 'ITA'
-     #                ,'Japan' = 'JPN'
-      #               ,'Russia' = 'RUS'
-       #              ,'Ukraine' = 'UKR'
-      #               ,'Belarus' ='BLR')
-#map.world_joined_max$region
-
-#admin1_choropleth(country.name = "bulgaria", 
- #                 df           = map.world_joined_max$region, 
-  #                legend       = "Random uniform data", 
-   #               num_colors   = 1) +
-  #geom_text(data = d_geo, aes(long, lat, label = clean_names, group = NULL), size = 2.5)
