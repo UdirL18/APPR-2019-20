@@ -19,82 +19,82 @@ ter poskušala predviditi rezultate za naslednje večje tekmovanje. Osredotočil
 
 ### Tabele:
 * Tabela wcg
-1. stolpec "Tekmovalka"
-  -stolpec z imenom in priimkom tekmovalke, tipa character.
+  1. stolpec "Tekmovalka"
+    -stolpec z imenom in priimkom tekmovalke, tipa character.
 
-2. stolpec "drzava"
-  -stolpec z kratico države, ki jo tekomovalka zastopa, tipa character.
+  2. stolpec "drzava"
+    -stolpec z kratico države, ki jo tekomovalka zastopa, tipa character.
+
+  3.  stolpec "rekvizit"
+    -stolpec, ki pove s katerim rekvizitom je tekmovalka dobila te ocene, tipa character. Ta stolpec sem dodala ko sem tabele združila ve eno.
+
+  4. stolpec  "tekma"
+    -stolpec, ki pove na kateri tekmi je tekmovalka dobila te ocene, tipa character. Ta stolpec sem dodala ko sem tabele združila ve eno.  
+
+  5. stolpec "DA"
+    -stolpec z seštevkom tehničnih vrednostih z rekvizitom, tipa numeric.
+
+  6. stolpec "BA"
+    -stolpec z seštevkom tehničnih vrednostih z telesom, tipa numeric. 
+
+  7. stolpec "EA"
+    -stolpec z odbitkom kompozicijskih izvedbenih napak, tipa numeric.
+
+  8. stolpec "ET"
+    -stolpec z odbitkom tehničnih izvedbenih napak, tipa numeric. 
+
+  9. stolpec "Pen"
+    -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
+
   
-3.  stolpec "rekvizit"
-  -stolpec, ki pove s katerim rekvizitom je tekmovalka dobila te ocene, tipa character. Ta stolpec sem dodala ko sem tabele združila ve eno.
-  
-4. stolpec  "tekma"
-  -stolpec, ki pove na kateri tekmi je tekmovalka dobila te ocene, tipa character. Ta stolpec sem dodala ko sem tabele združila ve eno.  
-  
-5. stolpec "DA"
-  -stolpec z seštevkom tehničnih vrednostih z rekvizitom, tipa numeric.
-  
-6. stolpec "BA"
-  -stolpec z seštevkom tehničnih vrednostih z telesom, tipa numeric. 
-  
-7. stolpec "EA"
-  -stolpec z odbitkom kompozicijskih izvedbenih napak, tipa numeric.
-  
-8. stolpec "ET"
-  -stolpec z odbitkom tehničnih izvedbenih napak, tipa numeric. 
-  
-9. stolpec "Pen"
-  -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
-  
-  
-**OPOMBA**: končna ocena je sestavlejena iz ocene težavnosti, odbitka izvedbenih napak in odbitkov s strani sodnice koordinatorke, časomerilke in linijskih sodnic. Ocena težavnosti je sestavljena iz dveh komponent (težine s telesom in težine z rekvizitom). Odbitek izvedbenih napak se odšteje od 10.00 točk in nato prišteje končni oceni.   
+  **OPOMBA**: končna ocena je sestavlejena iz ocene težavnosti, odbitka izvedbenih napak in odbitkov s strani sodnice koordinatorke, časomerilke in linijskih sodnic. Ocena       težavnosti je sestavljena iz dveh komponent (težine s telesom in težine z rekvizitom). Odbitek izvedbenih napak se odšteje od 10.00 točk in nato prišteje končni oceni.   
   
 * Tabela ecg
-1. stolpec "Tekmovalka"
-  -stolpec z imenom in priimkom tekmovalke, tipa character.
+  1. stolpec "Tekmovalka"
+    -stolpec z imenom in priimkom tekmovalke, tipa character.
 
-2. stolpec "drzava"
-  -stolpec z kratico države, ki jo tekomovalka zastopa, tipa character.
+  2. stolpec "drzava"
+    -stolpec z kratico države, ki jo tekomovalka zastopa, tipa character.
 
-3.  stolpec "rekvizit"
-  -stolpec, ki pove s katerim rekvizitom je tekmovalka dobila te ocene, tipa character. 
-  
-4. stolpec  "tekma"
-  -stolpec, ki pove na kateri tekmi je tekmovalka dobila te ocene, tipa character. 
-  
-5. stolpec "E"
-  -stolpec z odbitkom izvedbenih napak, tipa numeric.  
-  
-6. stolpec "D"
-  -stolpec z seštevkom tehničnih vrednostih, tipa numeric. 
-    
-7. stolpec "Pen"
-  -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
-  
-8.  stolpec "koncna_ocena"
-  -stolpec s koncno oceno, tipa numeric. 
+  3.  stolpec "rekvizit"
+    -stolpec, ki pove s katerim rekvizitom je tekmovalka dobila te ocene, tipa character. 
+
+  4. stolpec  "tekma"
+    -stolpec, ki pove na kateri tekmi je tekmovalka dobila te ocene, tipa character. 
+
+  5. stolpec "E"
+    -stolpec z odbitkom izvedbenih napak, tipa numeric.  
+
+  6. stolpec "D"
+    -stolpec z seštevkom tehničnih vrednostih, tipa numeric. 
+
+  7. stolpec "Pen"
+    -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
+
+  8.  stolpec "koncna_ocena"
+    -stolpec s koncno oceno, tipa numeric. 
   
 * Tabela skupinske
-1. stolpec "drzava"
-  -stolpec z imenom države, ki jo tekomovalke zastopajo, tipa character.
-  
-2. stolpec "E"
-  -stolpec z odbitkom izvedbenih napak, tipa numeric.  
-  
-3. stolpec "D"
-  -stolpec z seštevkom tehničnih vrednostih, tipa numeric. 
-    
-4. stolpec "Pen"
-  -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
-  
-5.  stolpec "koncna_ocena"
-  -stolpec s koncno oceno, tipa numeric.
+  1. stolpec "drzava"
+    -stolpec z imenom države, ki jo tekomovalke zastopajo, tipa character.
 
-6.  stolpec "rekvizit"
-  -stolpec, ki pove s katerim rekvizitom so tekmovalke dobile te ocene, tipa character. 
-  
-7. stolpec  "tekma"
-  -stolpec, ki pove na kateri tekmi so tekmovalke dobile te ocene, tipa character. 
+  2. stolpec "E"
+    -stolpec z odbitkom izvedbenih napak, tipa numeric.  
+
+  3. stolpec "D"
+    -stolpec z seštevkom tehničnih vrednostih, tipa numeric. 
+
+  4. stolpec "Pen"
+    -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
+
+  5.  stolpec "koncna_ocena"
+    -stolpec s koncno oceno, tipa numeric.
+
+  6.  stolpec "rekvizit"
+    -stolpec, ki pove s katerim rekvizitom so tekmovalke dobile te ocene, tipa character. 
+
+  7. stolpec  "tekma"
+    -stolpec, ki pove na kateri tekmi so tekmovalke dobile te ocene, tipa character. 
   
 
    
