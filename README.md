@@ -5,10 +5,18 @@ Repozitorij z gradivi pri predmetu APPR v študijskem letu 2019/20
 * [![Shiny](http://mybinder.org/badge.svg)](http://mybinder.org/v2/gh/UdirL18/APPR-2019-20/master?urlpath=shiny/APPR-2019-20/projekt.Rmd) Shiny
 * [![RStudio](http://mybinder.org/badge.svg)](http://mybinder.org/v2/gh/UdirL18/APPR-2019-20/master?urlpath=rstudio) RStudio
 
-## Tematika
+## Analiza rezultatov tekmovanj v ritmični gimnastiki.
 
-Izbrali si boste temo, s katero se bo vaš projekt ukvarjal.
-Tukaj boste napisali, kje ste dobili podatke, ter kakšen je vaš cilj.
+Pri projektu bom analizirala rezultate svetovnih in evropskih prvenstev. Predvsem se bom osredotočila na spremembe ocene tekom olimpijskega cikla, 
+ter poskušala predviditi rezultate za naslednje večje tekmovanje. Osredotočila se bom na tri večja tekmovanja:
+* ZA INDUVIDUALNE SESTAVE
+*[36th FIG Rhythmic Gymnastics World Championships](https://gym.longinestiming.com/File/0000110101FFFFFFFFFFFFFFFFFFFF03): podatki v obliki CSV, 
+*[37th FIG Rhythmic Gymnastics World Championships](https://gym.longinestiming.com/File/000012000100FFFFFFFFFFFFFFFFFF04): podatki v obliki CSV,
+*[2020 European Championships in Rhythmic Gymnastics](https://backend.europeangymnastics.com/sites/default/files/paragraph/age-group-competition-info/competition-results/SENIORS%20-%20Individual%20-%20All-around%20Final%20AllAroundResultsRg_0.pdf): podatki v obliki CSV.
+* ZA SKUPINSKE SESTATVE
+*[37th FIG Rhythmic Gymnastics World Championships](https://en.wikipedia.org/wiki/2019_Rhythmic_Gymnastics_World_Championships); podatki v obliki html,
+*[2020 European Championships in Rhythmic Gymnastics](https://backend.europeangymnastics.com/sites/default/files/paragraph/age-group-competition-info/competition-results/SENIORS%20-%20Group%20-%20Qualification%20AllAroundResultsRg_0.pdf): podatki v obliki CSV.
+
 
 ## Program
 
