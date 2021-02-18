@@ -23,90 +23,147 @@ source("lib/libraries.r", encoding="UTF-8")
 # Izris povezave do RStudia na Binderju
 source("lib/rstudio.r", encoding="UTF-8")
 ```
+# Analiza rezultatov tekmovanj v ritmični gimnastiki.
+## Izbira teme
 
-# Izbira teme
-
-Ideja projekta je analizirati rezultate svetovnih prvenstev v ritmični gimnastiki za induvidualne sestave. Primerjala bom ocene posameznih rekvizitov, kot tudi izvedbeno in težavnostno oceno med tekmovalkami.
-
-# Opis podatkov
-Viri posatkov:
-- podatki za svetovno prvenstvo v Bakuju:
-https://www.gymnastics.sport/site/events/results.php?idEvent=14845#filter
-
-- podatki za svetovno prvenstvo v Sofiji:
-https://www.gymnastics.sport/site/events/results.php?idEvent=13338
-
-Podatki so bili v pdf obliki. Najprej sem pdf datoteko pretvorila v csv datoteko in nato uvozila podatke. Neprečiščeni podatki so vsebovali tudi 10 stolpcev, ki so bili nepotrebni. Tip stolpcev je bil nepravilen. 
-
+Ideja projekta je analizirati rezultate svetovnih in evropskih prvenstev v ritmični gimnastiki za induvidualne ter skupinskesestave. 
+Primerjala bom ocene posameznih rekvizitov, kot tudi izvedbeno in težavnostno oceno med tekmovalkami in tekmami.
+Osredotočila se bom na tri večja tekmovanja:
+* ZA INDUVIDUALNE SESTAVE
+1. [36th FIG Rhythmic Gymnastics World Championships](https://gym.longinestiming.com/File/0000110101FFFFFFFFFFFFFFFFFFFF03): podatki v obliki CSV, 
+2. [37th FIG Rhythmic Gymnastics World Championships](https://gym.longinestiming.com/File/000012000100FFFFFFFFFFFFFFFFFF04): podatki v obliki CSV,
+3. [2020 European Championships in Rhythmic Gymnastics](https://backend.europeangymnastics.com/sites/default/files/paragraph/age-group-competition-info/competition-results/SENIORS%20-%20Individual%20-%20All-around%20Final%20AllAroundResultsRg_0.pdf): podatki v obliki CSV.
+* ZA SKUPINSKE SESTATVE
+1. [37th FIG Rhythmic Gymnastics World Championships](https://en.wikipedia.org/wiki/2019_Rhythmic_Gymnastics_World_Championships); podatki v obliki html,
+2. [2020 European Championships in Rhythmic Gymnastics](https://backend.europeangymnastics.com/sites/default/files/paragraph/age-group-competition-info/competition-results/SENIORS%20-%20Group%20-%20Qualification%20AllAroundResultsRg_0.pdf): podatki v obliki CSV.
 
 ![](slike/grb.png)
 
 ***
 
-# Obdelava, uvoz in čiščenje podatkov
+## Obdelava, uvoz in čiščenje podatkov
 
 ```{r uvoz, echo=FALSE, message=FALSE}
-source("uvoz/uvoz.r", encoding="UTF-8")
+source("uvoz/mojuvoz.R", encoding="UTF-8")
 ```
+**OPOMBA**: Podatki so bili v pdf obliki. Najprej sem pdf datoteko pretvorila v csv datoteko in nato uvozila podatke. Neprečiščeni podatki so vsebovali tudi 10 stolpcev, ki so bili nepotrebni. Tip stolpcev je bil nepravilen. Uvoženi podatki so bili v različnih tabelah, ki sem jih nato združila v eno razpredelnico v obliki *tidy data*.
 
-Uvozila sem podatke v obliki CSV s mednarodne gimnastične zveze. Podatki so bili v osmih tabelah, ki sem jih združila v eno razpredelnico v obliki *tidy data*.
+1. Tabela **wcg**
+  - stolpec **"Tekmovalka"**
+    -stolpec z imenom in priimkom tekmovalke, tipa character.
 
-1. "Tekmovalka"
-  -stolpec z imenom in priimkom tekmovalke, tipa character.
+  - stolpec **"drzava"**
+    -stolpec z kratico države, ki jo tekomovalka zastopa, tipa character.
 
-2."drzava"
-  -stolpec z kratico države, ki jo tekomovalka zastopa, tipa character.
-  
-3."DA"
-  -stolpec z seštevkom tehničnih vrednostih z rekvizitom, tipa numeric.
-  
-4."BA"
-  -stolpec z seštevkom tehničnih vrednostih z telesom, tipa numeric. 
-  
-5."EA"
-  -stolpec z odbitkom kompozicijskih izvedbenih napak, tipa numeric.
-  
-6."ET"
-  -stolpec z odbitkom tehničnih izvedbenih napak, tipa numeric. 
-  
-7."Pen"
-  -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
-  
-8. "rekvizit"
-  -stolpec, ki pove s katerim rekvizitom je tekmovalka dobila te ocene, tipa character. Ta stolpec sem dodala ko sem     tabele združila ve eno.
-  
-9. "tekma"
-  -stolpec, ki pove na kateri tekmi je tekmovalka dobila te ocene, tipa character. Ta stolpec sem dodala ko sem tabele    združila ve eno.
-  
-**OPOMBA**: končna ocena je sestavlejena iz ocene težavnosti, odbitka izvedbenih napak in odbitkov s strani sodnice koordinatorke, časomerilke in linijskih sodnic. Ocena težavnosti je sestavljena iz dveh komponent (težine s telesom in težine z rekvizitom). Odbitek izvedbenih napak se odšteje od 10.00 točk in nato prišteje končni oceni.   
-  
-  
+  -  stolpec **"rekvizit"**
+    -stolpec, ki pove s katerim rekvizitom je tekmovalka dobila te ocene, tipa character. Ta stolpec sem dodala ko sem tabele združila ve eno.
 
-Spodnji graf prikazuje porazdelitev števila naselij v občinah.
+  - stolpec  **"tekma"**
+    -stolpec, ki pove na kateri tekmi je tekmovalka dobila te ocene, tipa character. Ta stolpec sem dodala ko sem tabele združila ve eno.  
 
-```{r histogram, echo=FALSE, message=FALSE, fig.align='center', fig.cap='Histogram števila naselij v občinah'}
-ggplot(obcine, aes(x=naselja)) + geom_histogram() +
-  ggtitle("Pogostost števila naselij") + xlab("Število naselij") + ylab("Število občin")
-```
+  - stolpec **"DA"**
+    -stolpec z seštevkom tehničnih vrednostih z rekvizitom, tipa numeric.
+
+  - stolpec **"DB"**
+    -stolpec z seštevkom tehničnih vrednostih z telesom, tipa numeric. 
+
+  - stolpec **"EA"**
+    -stolpec z odbitkom kompozicijskih izvedbenih napak, tipa numeric.
+
+  - stolpec **"ET"**
+    -stolpec z odbitkom tehničnih izvedbenih napak, tipa numeric. 
+
+  - stolpec **"Pen"**
+    -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
+
+  
+  **OPOMBA**: končna ocena je sestavlejena iz ocene težavnosti, odbitka izvedbenih napak in odbitkov s strani sodnice koordinatorke, časomerilke in linijskih sodnic. Ocena       težavnosti je sestavljena iz dveh komponent (težine s telesom in težine z rekvizitom). Odbitek izvedbenih napak se odšteje od 10.00 točk in nato prišteje končni oceni.   
+  
+* Tabela **ecg**
+  - stolpec **"Tekmovalka"**
+    -stolpec z imenom in priimkom tekmovalke, tipa character.
+
+  - stolpec **drzava**
+    -stolpec z kratico države, ki jo tekomovalka zastopa, tipa character.
+
+  - stolpec **"rekvizit"**
+    -stolpec, ki pove s katerim rekvizitom je tekmovalka dobila te ocene, tipa character. 
+
+  - stolpec  **"tekma"**
+    -stolpec, ki pove na kateri tekmi je tekmovalka dobila te ocene, tipa character. 
+
+  - stolpec **"E"**
+    -stolpec z odbitkom izvedbenih napak, tipa numeric.  
+
+  - stolpec **"D"**
+    -stolpec z seštevkom tehničnih vrednostih, tipa numeric. 
+
+  - stolpec **"Pen"**
+    -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
+
+  - stolpec **"koncna_ocena"**
+    -stolpec s koncno oceno, tipa numeric. 
+  
+* Tabela skupinske
+  - stolpec **"drzava"**
+    -stolpec z imenom države, ki jo tekomovalke zastopajo, tipa character.
+
+  - stolpec **"E"**
+    -stolpec z odbitkom izvedbenih napak, tipa numeric.  
+
+  - stolpec **"D"**
+    -stolpec z seštevkom tehničnih vrednostih, tipa numeric. 
+
+  - stolpec **"Pen"**
+    -stolpec z odbitkom sodnice koordinatorke, časomerilk in linijskih sodnic , tipa numeric.  
+
+  - stolpec **"koncna_ocena"**
+    -stolpec s koncno oceno, tipa numeric.
+
+  - stolpec **"rekvizit"**
+    -stolpec, ki pove s katerim rekvizitom so tekmovalke dobile te ocene, tipa character. 
+
+  - stolpec  **"tekma"**
+    -stolpec, ki pove na kateri tekmi so tekmovalke dobile te ocene, tipa character. 
 
 ***
 
-# Analiza in vizualizacija podatkov
+## Analiza in vizualizacija podatkov
 
 ```{r vizualizacija, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 source("vizualizacija/vizualizacija.r", encoding="UTF-8")
 ```
+Pred analizo teh podatkov sem si zastavila naslednja vprašanja:
 
-Spodnji zemljevid prikazuje povprečno velikost družine za vsako občino.
+- Kako se je skozi olimpijski cikel spreminjala vrednost ocen (skupne in D)?
+- Kako se je vrednost AD spreminjala skozi olimpijski cikel za posamezno tekmovalko in posamezen rekvizit?
+- Pri katerem rekvizitu tekmovalke dobijo največji odbitek za izvedbo?
 
-```{r zemljevid, echo=FALSE, fig.align='center', fig.cap='Zemljevid povprečnega števila otrok v družini'}
-ggplot() + geom_polygon(data=left_join(zemljevid, povprecja, by=c("OB_UIME"="obcina")),
-                        aes(x=long, y=lat, group=group, fill=povprecje)) +
-  ggtitle("Povprečno število otrok v družini") + xlab("") + ylab("") +
-  guides(fill=guide_colorbar(title="Povprečje"))
+1. graf prikazuje dvig ocen skozi oliimpijski cikel.
+
+```{r graf1, echo=FALSE, fig.align='center'}
+graf1
+```
+
+2. graf prikazuje vrednosti težin z rekvizitom
+```{r graf3, echo=FALSE, fig.align='center'}
+graf3
+```
+
+3. graf prikazuje vrednost izvedbenega odbitka E
+```{r graf4, echo=FALSE, fig.align='center'}
+graf4
+```
+
+Spodnji zemljevid prikazuje države z tekmovalkami v finalih.
+
+```{r zemljevid_najvisjih_ocen, echo=FALSE, message=FALSE, warning=FALSE,fig.align='center', fig.cap='Države z najvišjo oceno v finalih'}
+ zemljevid_najvisjih_ocen
 ```
 
 ***
+
+
 
 # Napredna analiza podatkov
 
