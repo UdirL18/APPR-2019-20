@@ -1,12 +1,18 @@
 ################################################################################################################
 #3. FAZA: VIZUALIZACIJA PODATKOV - GRAFI
 ################################################################################################################
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#graf2 idk
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 require(ggplot2)
 require(dplyr)
 library(tidyverse) #mutate
 library(reshape2)
 library(scales) #izračun deleža
 library(wesanderson) #barva grafa
+library(reshape2) #za melt pri grafu 5
 
 
 #=============================================================================================================
@@ -85,7 +91,7 @@ dat_D <- dat %>%
 #ZDRUŽIMO TABELE
 #-----------------------------------------------------------------------------
 dat_graf1 <- rbind(dat_D, dat_mean, dat_mediana)
-View(dat_graf1)
+#View(dat_graf1)
 
 value <- dat_graf1$Value
 #------------------------------------------------------------------------------
@@ -156,6 +162,15 @@ print(graf1)
 
 
 
+
+
+
+
+
+#=============================================================================================================
+#2. KOLIKŠEN JE DELEŽ D V KONČNI OCENI ZA 5. NAJUSPEŠNEJŠO TEKMOVALKO NEGLEDE NA REKVIZIT?
+#______________________________________________________________________________________________________________
+
 #------------------------------------------------------------------------------
 #GRAF2-delž D v končni oceni za 5. najvišjo oceno
 #------------------------------------------------------------------------------
@@ -163,31 +178,42 @@ print(graf1)
 #=================================================================================
 #IDK WHAT THIS IS
 #===============================================================================
-induvidualne_5 <- induvidualne_viz#[c(5,15,25),]
+induvidualne_5 <- induvidualne_viz[c(5,15,25),]
 induvidualne_5 %>%
-  select(-c(rekvizit, D, koncna_ocena, ranking)) ->induvidualne_graf2#%>%
+  select(-c(D, koncna_ocena, ranking)) ->induvidualne_graf2#%>%
   #table() 
 View(induvidualne_graf2)
 
 #kr neki
-ggplot(induvidualne_graf2[c(5,15,25),], aes(x=tekma, y=delez)) +
-  geom_bar()
+#ggplot(induvidualne_graf2, aes(x=tekma, y=delez)) +
+#  geom_bar()
 
 #kr neki na kvadrat
-plot(induvidualne_graf2$tekma, induvidualne_graf2$delez, type = "b", pch = 19, 
-     col = "red", xlab = "x", ylab = "y")
+#plot(induvidualne_graf2$tekma, induvidualne_graf2$delez, type = "b", pch = 19, 
+#     col = "red", xlab = "x", ylab = "y")
 
 
-#okej sam se nič ne vidi
+#okej sam se nič ne vidi- ne vem če je to to kar si želim
 #----------------------------------------------------------------------------
-bp<- ggplot(induvidualne_graf2, aes(x="", y="", fill=delez))+
+bp<- ggplot(induvidualne_graf2, aes(x="", y="", fill=delez, colour=rekvizit))+
   geom_bar(width = 1, stat = "identity")
 bp
 
 pie <- bp +
   coord_polar("y", start=0)+
-  facet_grid(.~tekma)
-pie
+  facet_grid(.~tekma) +
+  #OZADJE-da se znebimo sivega ozadja
+  #--------------------------------------------------------
+  theme_bw() +
+  theme(#panel.grid.major = element_blank(), #narisani krogi
+        strip.background = element_blank(),
+        panel.border = element_blank(), #okvirji okoli vakega grafka
+  #NAPISI NA OSEH
+  #---------------------------------------------------------
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+  )
+ pie
 
 #----------------------------------------------------------------------------
 #lbls <- induvidualne_graf2$delez
@@ -203,30 +229,69 @@ pie
 
 
 
-#=============================================================================================================
-#2. KAKO SE JE SKOZI OLIMPISKI CIKEL SPREMINJALA VREDNOST DA (APPARATUS DIFFICULTY) IN KOLIKO JE ZARADI TEGA MANJ
-#POMEMBNA VREDNOST DB (BODY DIFFICULTY).
-#______________________________________________________________________________________________________________
-#primerjam DA in DE za tekmovalko Linoy Ashram za vsako vajo in
-#(predikcija kakšen bo DA na olimpijskih.)
-
-
-
-
-
 #==================================================================================================================
 #3. GRAF VREDNOSTI TEŽIN Z REKVIZITOM (2018,2019)
 #__________________________________________________________________________________________________________________
 #graf ki prikazuje koliko ima kakšna tekmovalka točk pri težinah z rekvizitom, 
-#problem je da ne vemo kater rekvizit je to-barvamo, tekmo-shape
+#problem je da ne vemo kater rekvizit je to bomo delili grafe, tekmo-color
+#Kijeva ni ker nisem dobila tako podrobnih rezultatov
 
-graf3 <- ggplot(data = wcg, mapping = aes(x = DA, y = tekmovalka, color = rekvizit, shape  = tekma)) +
+
+#------------------------------------------------------------------------ 
+#SKRAJŠAMO IMENA TEKMOVALK ZA LEPŠI PREGLED
+#-------------------------------------------------------------------------
+wcg_graf3 <- wcg #da ne uničimo tabele
+wcg_graf3$tekmovalka <- recode(wcg_graf3$tekmovalka
+                    ,"SELEZNEVA Ekaterina" = "SELEZNEVA" #KAJ JE = V KAJ ŽELIMO SPREMENITI
+                    ,"ASHRAM Linoy" =  "ASHRAM" 
+                    ,"AVERINA Dina" = "AVERINA D."            
+                    ,"ZELIKMAN Nicol" = "ZELIKMAN" 
+                    ,"KALEYN Boryana" = "KALEYN" 
+                    ,"AGIURGIUCULESE Alexandra" = "AGIURGIUCULESE" 
+                    ,"HALKINA Katsiaryna" ="HALKINA" 
+                    ,"SALOS Anastasiia" = "SALOS"
+                    ,"AVERINA Arina" = "AVERINA A."
+                    ,"BALDASSARRI Milena" = "BALDASSARRI"    
+                    ,"NIKOLCHENKO Vlada" = "NIKOLCHENKO"
+                    ,"GRISKENAS Evita" = "GRISKENAS"
+                    ,"HARNASKO Alina" = "HARNASKO"
+                    ,"ZENG Laura" = "ZENG"
+                    ,"TASEVA Katrin" = "TASEVA"          
+                    ,"SOLDATOVA Aleksandra" = "SOLDATOVA"   
+                    ,"VLADINOVA Neviana" = "VLADINOVA"
+                    ,"PAZHAVA Salome" = "PAZHAVA"
+                    ,"MINAGAWA Kaho" = "MINAGAWA")
+#View(wcg_graf3)
+
+#--------------------------------------------------------------------------------------
+#GRAF
+#--------------------------------------------------------------------------------------
+graf3 <- ggplot(data = wcg_graf3, mapping = aes(x = DA, y = tekmovalka, color = tekma)) +
   geom_point()+
-  ggtitle("vrednosti težin z rekvizitom")+ 
+  ggtitle("VREDNOSTI TEŽIN Z REKVIZITOM AD")+ 
   labs(x="vrednosti AD", y="tekmovalke") + 
-  facet_wrap( ~ rekvizit, ncol=8)
+  facet_wrap( ~ rekvizit, ncol=8) +
+  #------------------------------------------------------------------
+  # PREGLEDNEJŠA X OS
+  #------------------------------------------------------------
+  scale_x_continuous(breaks=c(2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10))+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        #------------------------------------------------------------
+        #DA JE NASLOV NA SREDINI
+        #------------------------------------------------------------
+        plot.title = element_text(hjust=0.5)
+  )
+  
 
 print(graf3)
+
+
+
+
+
+
+
+
 
 
 
@@ -238,7 +303,7 @@ print(graf3)
 #------------------------------------------------------------------------------------------------------
 #iz tabele induvidualne_finali iberemo max, min (GLEDE NA E), mediano in povprečje
 #neglede na tekmo, za vsak rekvizit posebaj
-induvidualne_E <- induv_zemljevid_finali # da ne povarimo tabele
+induvidualne_E <- induvidualne_finali # da ne povarimo tabele
 
 #najboljši E
 #--------------------------
@@ -283,7 +348,7 @@ graf4 <- ggplot(induv_graf4, aes(x=nacin, y=Value)) +
   geom_segment( aes(x=nacin, xend=nacin, y=0, yend=Value), color="grey") +
   geom_point( size=7.5, color=alpha("orange", 0.3), fill=alpha("orange", 0.3), alpha=0.7, shape=21, stroke=2)+
   #-----------------------------------------------------------------------
-  #IZPIS VREDNOSTI
+  #IZPIS VREDNOSTI V BUNKICAH
   #--------------------------------------------------------------------------
   geom_text(aes(label = round(Value,2), #navpična vrednost na grafu
                 angle = 90, 
@@ -294,6 +359,7 @@ graf4 <- ggplot(induv_graf4, aes(x=nacin, y=Value)) +
   #DEKORACIJA
   #--------------------------------------------------------------------------
   theme_light() +
+  ggtitle("KAKO SE IZVEDBENA OCENA E SPREMINJA GLEDE NA REKVIZIT")+
   theme(
     panel.grid.major.x = element_blank(),
     panel.border = element_blank(),
@@ -301,6 +367,10 @@ graf4 <- ggplot(induv_graf4, aes(x=nacin, y=Value)) +
     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5, size = 8),
     axis.ticks.y = element_blank(),
     axis.text.y = element_blank(),
+    #------------------------------------------------------------
+    #DA JE NASLOV NA SREDINI
+    #------------------------------------------------------------
+    plot.title = element_text(hjust=0.5)
   ) +
   xlab("") +
   ylab("vrednost izvedbenega odbitka E")+
@@ -318,5 +388,72 @@ print(graf4)
 
 
 #===================================================================================================
-#5. SKUPINSKE VAJE
+#5. ALI JE DVIG OCENE D VPLIVAL NA POVEČANJE ODBITKA E
+#___________________________________________________________________________________________________
+#Zanima me ali se 'splača' otežiti sestavo in s tem povečati vrednost D, glede na posledičen padec ocene E.
+#pogledali si bomo ocene ene tekmovalke-Linoy Ashram, (*v sofiji le v dveh finalih)
+#--------------------------------------------------------------------------------------------------
 
+#--------------------------------------------------------------------------------------------------
+#PRIPRAVA PODATKOV
+#--------------------------------------------------------------------------------------------------
+induvidualne_graf5 <- induvidualne_finali %>% 
+  filter(tekmovalka == "ASHRAM Linoy") %>% 
+  select(tekma,rekvizit, E, D)
+#View(induvidualne_graf5)
+
+#---------------------------------------------------------------------------------------------------
+#E in D moram zložit skupaj, in dodati stolpec alij je to D ali E ocena
+#---------------------------------------------------------------------------------------------------
+induv_graf5 <- induvidualne_graf5 %>% 
+  pivot_longer(c("E","D"), names_to = "ocena", values_to = "vrednosti") #pivot_longer(c(stolpci ki jih želimo združiti), samo imena stolpcev)
+
+
+#---------------------------------------------------------------------------------------------------
+#KRAJ TEKME NAS NE ZANIMA- ta korak ni potreben
+#---------------------------------------------------------------------------------------------------
+induv_graf5$tekma <- recode(induv_graf5$tekma
+                               ,"2018 Sofia" = "2018" #KAJ JE = V KAJ ŽELIMO SPREMENITI
+                               ,"2019 Baku" = "2019"
+                               ,"2020 Kijev" = "2020")
+
+#View(induv_graf5)
+
+
+
+#---------------------------------------------------------------------------------------
+#GRAF
+#---------------------------------------------------------------------------------------
+graf5 <- ggplot(induv_graf5, aes(x = tekma, y = vrednosti, colour = ocena))
+graf5 + 
+  geom_point() + 
+  facet_grid(.~rekvizit) +
+  #------------------------------------------------------------------------
+  #VREDNOSTI NAD PIKICAM
+  #------------------------------------------------------------------------
+  geom_text(aes(label = vrednosti, #navpična vrednost na grafu
+                #angle = 90, 
+                vjust = 1.50, 
+                hjust=0.5, 
+  ),size = 2.5) +
+  #------------------------------------------------------------------------
+  # OZADJE
+  #-----------------------------------------------------------------------
+theme_bw() +
+  theme(#panel.grid.major = element_blank(), #navpične črte
+        #panel.grid.minor = element_blank(), #vodoravne črte
+        strip.background = element_blank(), #siv pravokotniki pri imenih grafkov
+        #panel.border = element_blank(), #obkroži grafke
+        #----------------------------------------------------------------------
+        #NAPISI PRI X OSI, IZBRIS Y OSI 
+        #----------------------------------------------------------------------
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        axis.title.x = element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank()
+  )+
+  #-----------------------------------------------------------------------------
+  # NASLOV
+  #-----------------------------------------------------------------------------
+  ggtitle("ALI JE DVIG OCENE D VPLIVAL NA POVEČANJE ODBITKA E PRI TEKMOVALKI LINOY ASHRAM")+
+  theme(plot.title = element_text(hjust=0.5))
