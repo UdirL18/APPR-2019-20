@@ -170,14 +170,14 @@ ecg <- ecg[c('tekmovalka', 'drzava', 'tekma', 'rekvizit', 'E', 'D', 'Pen.', 'kon
 #=============================================================================================================
 #če bi želeli združit tabeli bi morali v wcg seštet EA 7 in  ET 8 da dobimo E nato DB in DA da dobimo D
 wcg_D_E <- wcg
-wcg_D_E$E <- wcg_D_E$EA + wcg_D_E$ET
+wcg_D_E$E <- 10 +wcg_D_E$EA + wcg_D_E$ET
 wcg_D_E$D <- wcg_D_E$DB + wcg_D_E$DA
-wcg_D_E$koncna_ocena <- wcg_D_E$D + 10 + wcg_D_E$E + wcg_D_E$Pen.
+wcg_D_E$koncna_ocena <- wcg_D_E$D  + wcg_D_E$E + wcg_D_E$Pen.
 wcg_D_E <- wcg_D_E[c('tekmovalka', 'drzava', 'tekma', 'rekvizit', 'E', 'D', 'Pen.', 'koncna_ocena')]
 #View(wcg_D_E)
 
 induvidualne <- rbind(ecg, wcg_D_E)
-View(induvidualne)
+#View(induvidualne)
 
 #===============================================================================================
 #SAMO "FINALISTKE"
