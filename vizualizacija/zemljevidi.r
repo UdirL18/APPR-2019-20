@@ -1,5 +1,5 @@
 ###########################################################################################
-#3. FAZA: VIZUALIZACIJA PODATKOV - ZEMLJEVIDI
+#3. FAZA: VIZUALIZACIJA PODATKOV - ZEMLJEVIDI #https://www.r-bloggers.com/2017/12/how-to-highlight-countries-on-a-map/
 ############################################################################################
 #NAVODILA:
 #-Na zemljevidu prikažite dva podatka - enega imenskega ali urejenostnega 
@@ -166,30 +166,38 @@ ggplot(map.world_joined, aes( x = long, y = lat, group = group )) +
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #-----------------------------------------------------------------------------------------------------
 vrstice_hoop <- map.world_joined[grep("hoop",map.world_joined$rekvizit),] %>% 
-  filter(koncna_ocena == "26.5")
+  filter(region == "Israel")
 vrstice_ball <- map.world_joined[grep("ball",map.world_joined$rekvizit),]%>% 
-  filter(koncna_ocena == "26")
+  filter(region == "Belarus")
 vrstice_clubs <- map.world_joined[grep("clubs",map.world_joined$rekvizit),]%>% 
-  filter(koncna_ocena == "26.55")
+  filter(region == "Belarus")
 vrstice_ribbon <- map.world_joined[grep("ribbon",map.world_joined$rekvizit),]%>% 
-  filter(koncna_ocena == "23.0")
+  filter(region == "Belarus")
+#vrstice_hoop <- map.world_joined[grep("hoop",map.world_joined$rekvizit),] %>% 
+#  filter(koncna_ocena == "26.5")
+#vrstice_ball <- map.world_joined[grep("ball",map.world_joined$rekvizit),]%>% 
+#  filter(koncna_ocena == "26")
+#vrstice_clubs <- map.world_joined[grep("clubs",map.world_joined$rekvizit),]%>% 
+#  filter(koncna_ocena == "26.55")
+#vrstice_ribbon <- map.world_joined[grep("ribbon",map.world_joined$rekvizit),]%>% 
+#  filter(koncna_ocena == "23.0")
 #max(map.world_joined$koncna_ocena, na.rm = TRUE) #katera je max ocena 26.55
 #max(vrstice_hoop$koncna_ocena, na.rm = TRUE) #max ocena pri obroču 26.5
 
 
 #preverimo katera vrstica ima maximalno oceno za posamezni rekvizit
 #------------------------------------------------------------------------------------------------------
-#which.max(vrstice_hoop$koncna_ocena) #2444; 26.5
-#which.max(vrstice_ball$koncna_ocena) #717; 26
-#which.max(vrstice_clubs$koncna_ocena) #802; 26.55
-#which.max(vrstice_ribbon$koncna_ocena) #538; 23.0
+#which.max(vrstice_hoop$koncna_ocena) #2444; 26.5 ISR
+#which.max(vrstice_ball$koncna_ocena) #717; 26 Belorusija
+#which.max(vrstice_clubs$koncna_ocena) #802; 26.55 belorusija
+#which.max(vrstice_ribbon$koncna_ocena) #538; 23.0 Belorusija
 
 
 #tabela 4 vrstic
 #-------------------------------------------------------------------------------------------------------
 max_ocena <- rbind(vrstice_hoop,vrstice_ball, vrstice_clubs, vrstice_ribbon) 
 max_ocena$najvisja_ocena <- "TRUE" #dodamo stolpec najvišja_ocena in ga nastavimo na TRUE(v vseh 4 vrsticah)
-
+#View(max_ocena)
 
 
 #združimo data !!!težava
@@ -213,6 +221,25 @@ ggplot(map.world_joined_max, aes( x = long, y = lat, group = group)) +
 #!!!!meje se nekaj črtkano zrišejo
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+#=====================================================================================
+#1.2.2 IZPIS IMEN NAJBOLJŠIH TEKMOVALK ZA DRŽAVO (Izrael, Rusija, Belorusija, Bulgaria)
+#=====================================================================================
+vrstice_tekmovalka_Isr <- map.world_joined[grep("Israel",map.world_joined$region),] %>% 
+  filter( koncna_ocena == max(koncna_ocena))
+vrstice_tekmovalka_Blr <- map.world_joined[grep("Belarus",map.world_joined$region),] %>% 
+  filter( koncna_ocena == max(koncna_ocena))
+vrstice_tekmovalka_Rus <- map.world_joined[grep("Russia",map.world_joined$region),] %>% 
+  filter( koncna_ocena == max(koncna_ocena))
+vrstice_tekmovalka_Bul <- map.world_joined[grep("Bulgaria",map.world_joined$region),] %>% 
+  filter( koncna_ocena == max(koncna_ocena))
+
+vrstice_tekmovalka <- rbind(vrstice_tekmovalka_Rus[5000,], vrstice_tekmovalka_Blr[1,], vrstice_tekmovalka_Isr[1,], vrstice_tekmovalka_Bul[1,])
+#View(vrstice_tekmovalka)
+
+
+ 
+
+
 
 
 #============================================================================================
@@ -235,8 +262,10 @@ ggplot(map.world_joined_max, aes( x = long, y = lat, group = group)) +
 #zemljevid_najvisjih_ocen
 #------------------------------------------------------------------------------------------
 zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long, y = lat, group = group)) +
-  geom_polygon(aes(color = as.factor(najvisja_ocena), fill = koncna_ocena) +
-  scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = 'black')))+
+  geom_polygon(aes(color = as.factor(najvisja_ocena), fill = koncna_ocena)) +
+  scale_color_manual(values = c('TRUE' = 'blue', 'FALSE' = 'black'))+
+  scale_fill_gradientn(colours = c('green1','yellow','orange','red')
+                       ,breaks = c(10, 16, 18, 20, 22, 24, 26))+
   #scale_fill_manual(values = c("red", "grey", "seagreen3")) +
   guides(fill = guide_legend(reverse = T)) +
   labs(fill = 'končna ocena'
@@ -263,11 +292,17 @@ zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long, y = lat,
            ,family = 'Gill Sans'
            ,color = '#CCCCCC'
            ,hjust = 'left'
-  )#+
-  #geom_text(aes(long.x, lat.x, label =imena , group = NULL), size = 0.5)
+  )+
+geom_text(data = vrstice_tekmovalka, aes(x = long, y = lat, label = tekmovalka), 
+           size = 3, col = "#CCCCCC", fontface = "bold")
 
 
 print(zemljevid_najvisjih_ocen)
+
+
+
+
+
 
 
 
