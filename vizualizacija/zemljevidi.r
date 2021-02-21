@@ -1,6 +1,14 @@
 ###########################################################################################
 #3. FAZA: VIZUALIZACIJA PODATKOV - ZEMLJEVIDI
 ############################################################################################
+#NAVODILA:
+#-Na zemljevidu prikažite dva podatka - enega imenskega ali urejenostnega 
+# (z majhnim številom vrednosti, npr. 3-6), in enega številskega. 
+#-Vsaj en od prikazanih podatkov naj pride iz vira, ločenega od zemljevida (npr. datoteka CSV).
+#-Na zemljevid lahko dodaste še oznake območij in narišete še nekaj točk s svojimi oznakami (npr. za mesta). 
+#-Podatki o koordinatah točk naj bodo v priloženi datoteki CSV.
+
+#!!!!idk če imam to
 
 #===========================================================================================
 #KNJIŽNICE
@@ -35,7 +43,7 @@ library(dplyr)
 #ZEMLEVID SVETA
 #============================================================================================
 
-map.world <- map_data("world", xlim=c(-100,100),ylim=c(20,100)) 
+map.world <- map_data("world") #, xlim=c(-120,100),ylim=c(-20,100)) 
 #potrebujem le ta del zemljevida saj v južnem delu ni nobene države s tekmovalko v finalih
 #zanemarimo japonsko k je itak kiksala na veliko
 
@@ -91,7 +99,7 @@ induv_zemljevid$drzava <- recode(induv_zemljevid$drzava
 # LEFT JOIN- če v induv_zemljevid ni te države bo ohranil podatke iz map.world
 map.world_joined <- left_join(map.world, induv_zemljevid, by = c('region' = 'drzava'))
 
-#View(map.world_joined)
+#View(map.world_joined) #long lat group order region subregion tekmovalka tekma rekvizit E D Pen. koncna_ocena
 
 
 #============================================================================================
@@ -157,41 +165,48 @@ ggplot(map.world_joined, aes( x = long, y = lat, group = group )) +
 #!!!!tukaj ne vem glih točno kaj grep dela
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #-----------------------------------------------------------------------------------------------------
-vrstice_hoop <- map.world_joined[grep("hoop",map.world_joined$rekvizit),]
-vrstice_ball <- map.world_joined[grep("ball",map.world_joined$rekvizit),]
-vrstice_clubs <- map.world_joined[grep("clubs",map.world_joined$rekvizit),]
-vrstice_ribbon <- map.world_joined[grep("ribbon",map.world_joined$rekvizit),]
+vrstice_hoop <- map.world_joined[grep("hoop",map.world_joined$rekvizit),] %>% 
+  filter(koncna_ocena == "26.5")
+vrstice_ball <- map.world_joined[grep("ball",map.world_joined$rekvizit),]%>% 
+  filter(koncna_ocena == "26")
+vrstice_clubs <- map.world_joined[grep("clubs",map.world_joined$rekvizit),]%>% 
+  filter(koncna_ocena == "26.55")
+vrstice_ribbon <- map.world_joined[grep("ribbon",map.world_joined$rekvizit),]%>% 
+  filter(koncna_ocena == "23.0")
 #max(map.world_joined$koncna_ocena, na.rm = TRUE) #katera je max ocena 26.55
 #max(vrstice_hoop$koncna_ocena, na.rm = TRUE) #max ocena pri obroču 26.5
 
 
 #preverimo katera vrstica ima maximalno oceno za posamezni rekvizit
 #------------------------------------------------------------------------------------------------------
-#which.max(vrstice_hoop$koncna_ocena) #2444
-#which.max(vrstice_ball$koncna_ocena) #717
-#which.max(vrstice_clubs$koncna_ocena) #802
-#which.max(vrstice_ribbon$koncna_ocena) #538
+#which.max(vrstice_hoop$koncna_ocena) #2444; 26.5
+#which.max(vrstice_ball$koncna_ocena) #717; 26
+#which.max(vrstice_clubs$koncna_ocena) #802; 26.55
+#which.max(vrstice_ribbon$koncna_ocena) #538; 23.0
 
 
 #tabela 4 vrstic
 #-------------------------------------------------------------------------------------------------------
-max_ocena <- rbind(vrstice_hoop[2444, ],vrstice_ball[717, ],vrstice_clubs[802, ],vrstice_ribbon[538, ]) 
+max_ocena <- rbind(vrstice_hoop,vrstice_ball, vrstice_clubs, vrstice_ribbon) 
 max_ocena$najvisja_ocena <- "TRUE" #dodamo stolpec najvišja_ocena in ga nastavimo na TRUE(v vseh 4 vrsticah)
 
 
 
-#združimo data
+#združimo data !!!težava
 #--------------------------------------------------------------------------------------------------------
-map.world_joined_max <- left_join(map.world_joined, max_ocena, by = c('region' = 'region'))
+map.world_joined_max <- left_join(map.world_joined, max_ocena, by = c('long' = 'long','lat' = 'lat', 'group' = 'group', 'order' = 'order', 'region'= 'region', 'subregion' = 'subregion', 'tekmovalka' = 'tekmovalka', 'tekma' = 'tekma', 'rekvizit' = 'rekvizit', 'E' = 'E', 'D' = 'D', 'Pen.' = 'Pen.', 'koncna_ocena' = 'koncna_ocena',  'fill_flg' = 'fill_flg'))
 
-map.world_joined_max <- map.world_joined_max %>% mutate(fill_flg = ifelse(is.na(najvisja_ocena),F,T))
-
+map.world_joined_max <- map.world_joined_max %>% 
+  mutate(najvisja_ocena = ifelse(is.na(najvisja_ocena),F,T))
+#is.na vrne TRUE, če je na danem mestu NA, sicer FALSE
+#ifelse(test, yes, no) test = data, če true vrne yes, če false no
+#View(map.world_joined_max)
 
 
 #zemljevid
 #--------------------------------------------------------------------------------------------------------
-ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
-  geom_polygon(aes(color = as.factor(fill_flg))) +
+ggplot(map.world_joined_max, aes( x = long, y = lat, group = group)) +
+  geom_polygon(aes(color = as.factor(najvisja_ocena))) +
   scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = NA))
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -219,9 +234,10 @@ ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
 #------------------------------------------------------------------------------------------
 #zemljevid_najvisjih_ocen
 #------------------------------------------------------------------------------------------
-zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long.x, y = lat.x, group = group.x )) +
-  geom_polygon(aes(color = as.factor(fill_flg), fill = koncna_ocena.x)) +
-  scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = 'black'))+
+zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long, y = lat, group = group)) +
+  geom_polygon(aes(color = as.factor(najvisja_ocena), fill = koncna_ocena) +
+  scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = 'black')))+
+  #scale_fill_manual(values = c("red", "grey", "seagreen3")) +
   guides(fill = guide_legend(reverse = T)) +
   labs(fill = 'končna ocena'
        ,color = 'najvišja ocena '
