@@ -97,19 +97,22 @@ ecg_kijev_skupinske <- rbind(kijev_kiji_obroci, kijev_zoge)
 #SKUPNA TABELA SKUPINSKIH VAJ
 skupinske <- rbind(wcg_baku_skupinske, ecg_kijev_skupinske)
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 #ni mi všeč ker mam nekje države poimenovane z kraticam nekje pa s celim imenom
-#wcg_skupinske$drzava <- recode(wcg$drzava 
-#                     ,'BUL' = 'Bulgaria'
-#                     ,'ISR' = 'Israel'
-#                     ,'ITA' = 'Italy'
-#                     ,'JPN' = 'Japan'
-#                     ,'RUS' = 'Russia'
-#                     ,'UKR' = 'Ukraine'
-#                     ,'AZE' = 'Azerbaijan'
-#                     ,'CHN' = 'China'
-#                     ,'BLR' = 'Belarus')
-View(skupinske)
+skupinske$drzava <- recode(skupinske$drzava 
+                     ,'BUL' = 'Bulgaria'
+                     ,'ISR' = 'Israel'
+                     ,'ITA' = 'Italy'
+                     ,'JPN' = 'Japan'
+                     ,'RUS' = 'Russia'
+                     ,'UKR' = 'Ukraine'
+                     ,'AZE' = 'Azerbaijan'
+                     ,'CHN' = 'China'
+                     ,'BLR' = 'Belarus'
+                     ,'TUR' = 'Turkey'
+                     ,'FRA' = 'France'
+                     ,'EST' = 'Estonia')
+#View(skupinske)
 
 
 ################################################################################################################
