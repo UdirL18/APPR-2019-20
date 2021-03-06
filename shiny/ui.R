@@ -1,11 +1,11 @@
 library(shiny)
 
 shinyUI(fluidPage(
-  navbarPage("Analiza rezultatov tekmovanj ritmične gimnastike",
+  navbarPage("Analiza rezultatov tekmovanj ritmične gimnastike:",
              
              
              tabPanel("Tekmovalke",
-                      titlePanel("Rezultati za induvidualne tekmovalke"),
+                      titlePanel("Rezultati individualnih tekmovalk"),
                       sidebarPanel(
                         selectInput(inputId = "tekmovalka",
                                     label = "Izberite tekmovalko",
@@ -14,7 +14,7 @@ shinyUI(fluidPage(
              
              
              tabPanel("Skupinske sestave",
-                      titlePanel("Rezultati za skupinske sestave"),
+                      titlePanel("Rezultati skupinskih sestav"),
                       sidebarPanel(
                         selectInput(inputId = "tekma",
                                     label = "Izberite tekmo",
@@ -22,4 +22,29 @@ shinyUI(fluidPage(
                       mainPanel(plotOutput("tekma")))
              
              
+             #tabPanel("Rekvizit",
+            #          titlePanel("SKUPINE INDIVIDUALNIH TEKMOVALK ZA VSAK REKVIZIT"),
+            #          sidebarPanel(
+            #            selectInput(inputId = "rekvizit",
+            #                        label = "Izberite rekvizit",
+            #                        choices = unique(ecg$rekvizit))),
+            #          mainPanel(plotOutput("rekvizit")))
+             
+             
   )))
+
+#shinyUI(fluidPage(
+#  navbarPage("SKUPINE INDIVIDUALNIH TEKMOVALK ZA VSAK REKVIZIT:",
+#             
+#             
+#             tabPanel("Rekvizit",
+#                      titlePanel("SKUPINE INDIVIDUALNIH TEKMOVALK ZA VSAK REKVIZIT"),
+#                      sidebarPanel(
+#                        selectInput(inputId = "rekvizit",
+#                                    label = "Izberite rekvizit",
+#                                    choices = unique(ecg$rekvizit))),
+#                      mainPanel(plotOutput("rekvizit"))),
+#             
+#             
+#             
+#  )))
