@@ -1,5 +1,5 @@
 ---
-title: "Analiza rezultatov RGI"
+title: "Poročilo pri predmetu Analiza podatkov s programom R"
 author: "Lucija Udir"
 output:
   html_document: default
@@ -10,45 +10,63 @@ output:
 runtime: shiny
 ---
 
-```{r setup, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-# Če želimo nastaviti pisave v PDF-ju, odkomentiramo
-# in sledimo navodilom v programu.
-#source("fontconfig.r", encoding="UTF-8")
 
+
+
+```{r setup, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
 # Uvoz vseh potrebnih knjižnic
 source("lib/libraries.r", encoding="UTF-8")
 ```
 
-```{r rstudio, echo=FALSE, results='asis'}
+```{r rstudio, results='asis'}
 # Izris povezave do RStudia na Binderju
 source("lib/rstudio.r", encoding="UTF-8")
 ```
+***
+
 # Analiza rezultatov tekmovanj v ritmični gimnastiki.
+***
 ## Izbira teme
 
 Ideja projekta je analizirati rezultate svetovnih in evropskih prvenstev v ritmični gimnastiki za induvidualne ter skupinskesestave. 
 Primerjala bom ocene posameznih rekvizitov, kot tudi izvedbeno in težavnostno oceno med tekmovalkami in tekmami.
 Osredotočila se bom na tri večja tekmovanja:
-* ZA INDUVIDUALNE SESTAVE
+
+* **ZA INDUVIDUALNE SESTAVE**
+
 1. [36th FIG Rhythmic Gymnastics World Championships](https://gym.longinestiming.com/File/0000110101FFFFFFFFFFFFFFFFFFFF03): podatki v obliki CSV, 
+
 2. [37th FIG Rhythmic Gymnastics World Championships](https://gym.longinestiming.com/File/000012000100FFFFFFFFFFFFFFFFFF04): podatki v obliki CSV,
+
 3. [2020 European Championships in Rhythmic Gymnastics](https://backend.europeangymnastics.com/sites/default/files/paragraph/age-group-competition-info/competition-results/SENIORS%20-%20Individual%20-%20All-around%20Final%20AllAroundResultsRg_0.pdf): podatki v obliki CSV.
-* ZA SKUPINSKE SESTATVE
+
+* **ZA SKUPINSKE SESTATVE**
+
 1. [37th FIG Rhythmic Gymnastics World Championships](https://en.wikipedia.org/wiki/2019_Rhythmic_Gymnastics_World_Championships); podatki v obliki html,
+
 2. [2020 European Championships in Rhythmic Gymnastics](https://backend.europeangymnastics.com/sites/default/files/paragraph/age-group-competition-info/competition-results/SENIORS%20-%20Group%20-%20Qualification%20AllAroundResultsRg_0.pdf): podatki v obliki CSV.
 
-![](slike/grb.png)
+**OPOMBA:** Za lažje razummevanje podatkov, si lahko preberemo [FIG pravilnik](https://www.gymnastics.sport/publicdir/rules/files/en_RG%20CoP%202017-2020%20with%20Errata%20Dec.%2017.pdf).
 
 ***
 
 ## Obdelava, uvoz in čiščenje podatkov
-
 ```{r uvoz, echo=FALSE, message=FALSE}
-source("uvoz/mojuvoz.R", encoding="UTF-8")
+source("uvoz/uvoz1.r", encoding="UTF-8")
+source("uvoz/uvoz_html.r", encoding="UTF-8")
 ```
-**OPOMBA**: Podatki so bili v pdf obliki. Najprej sem pdf datoteko pretvorila v csv datoteko in nato uvozila podatke. Neprečiščeni podatki so vsebovali tudi 10 stolpcev, ki so bili nepotrebni. Tip stolpcev je bil nepravilen. Uvoženi podatki so bili v različnih tabelah, ki sem jih nato združila v eno razpredelnico v obliki *tidy data*.
 
+
+**OPOMBA:** Podatki so bili v pdf obliki. Najprej sem pdf datoteko pretvorila v csv datoteko in nato uvozila podatke. Neprečiščeni podatki so vsebovali tudi 10 stolpcev, ki so bili nepotrebni. Tip stolpcev je bil nepravilen. Uvoženi podatki so bili v različnih tabelah, ki sem jih nato združila v eno razpredelnico v obliki *tidy data*.
+
+<br>
 1. Tabela **wcg**
+
   - stolpec **"Tekmovalka"**
     -stolpec z imenom in priimkom tekmovalke, tipa character.
 
@@ -78,8 +96,10 @@ source("uvoz/mojuvoz.R", encoding="UTF-8")
 
   
   **OPOMBA**: končna ocena je sestavlejena iz ocene težavnosti, odbitka izvedbenih napak in odbitkov s strani sodnice koordinatorke, časomerilke in linijskih sodnic. Ocena       težavnosti je sestavljena iz dveh komponent (težine s telesom in težine z rekvizitom). Odbitek izvedbenih napak se odšteje od 10.00 točk in nato prišteje končni oceni.   
-  
-* Tabela **ecg**
+ 
+<br>
+2. Tabela **ecg**
+
   - stolpec **"Tekmovalka"**
     -stolpec z imenom in priimkom tekmovalke, tipa character.
 
@@ -103,8 +123,10 @@ source("uvoz/mojuvoz.R", encoding="UTF-8")
 
   - stolpec **"koncna_ocena"**
     -stolpec s koncno oceno, tipa numeric. 
-  
-* Tabela skupinske
+    
+<br>
+3. Tabela **skupinske**
+
   - stolpec **"drzava"**
     -stolpec z imenom države, ki jo tekomovalke zastopajo, tipa character.
 
@@ -125,66 +147,210 @@ source("uvoz/mojuvoz.R", encoding="UTF-8")
 
   - stolpec  **"tekma"**
     -stolpec, ki pove na kateri tekmi so tekmovalke dobile te ocene, tipa character. 
+<br>
 
 ***
 
-## Analiza in vizualizacija podatkov
 
-```{r vizualizacija, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+## Analiza in vizualizacija podatkov 
+
+```{r vizualizacija, message=FALSE, warning=FALSE, include=FALSE, results='hide'}
 source("vizualizacija/vizualizacija.r", encoding="UTF-8")
 ```
-Pred analizo teh podatkov sem si zastavila naslednja vprašanja:
+Pred analizo in vizualizacijo podatkov sem si zastavila naslednja vprašanja:
 
 - Kako se je skozi olimpijski cikel spreminjala vrednost ocen (skupne in D)?
+
 - Kako se je vrednost AD spreminjala skozi olimpijski cikel za posamezno tekmovalko in posamezen rekvizit?
+
 - Pri katerem rekvizitu tekmovalke dobijo največji odbitek za izvedbo?
 
-1. graf prikazuje dvig ocen skozi oliimpijski cikel.
-
+***
+<br>
+**1. graf** prikazuje dvig ocen skozi olimpijski cikel.
+<br>
 ```{r graf1, echo=FALSE, fig.align='center'}
 graf1
 ```
+<br>
+Opazimo občutno povečanje končne ocene, kar pa je predvsem posledica dviga vrednosti D, saj se vrednost E ni zmanjšala. Iz rezultatov tekme v Kijevu leta 2020 vidimo, da je v primerjavi s prejšnim dvema tekmovanjema, povprečna ocena višja od mediane. To bi bila lahko posledica majšega števila vrhunskih tekmovalk na tej tekmi.
 
-2. graf prikazuje vrednosti težin z rekvizitom
+***
+
+<br>
+**2. graf** prikazuje vrednosti težin z rekvizitom
+<br>
 ```{r graf3, echo=FALSE, fig.align='center'}
 graf3
 ```
+<br>
+Če oceno D analiziramo še bolj podrobno lahko vidimo da je dviga le te, posledica dviga ocene AD in ne BD. Najvišje ocene AD so tekmovalke dobile pri kijih in sicer 9,9. Opazimo tudi da je dvig ocene AD manjši pri traku kot pri drugih treh rekvizitih.
+<br>
 
-3. graf prikazuje vrednost izvedbenega odbitka E
+***
+
+<br>
+**3. graf** prikazuje vrednost izvedbenega odbitka E
+<br>
 ```{r graf4, echo=FALSE, fig.align='center'}
 graf4
 ```
+<br>
+Na grafu so prikazane vrednosti izvedbene ocene E. čeprav se povprečja izvedbenih ocen ne razlikujejo za veliko, lahko ponovno opazimo nižjo vrednost ocene E pri traku. Minimalna ocena pri traku je precej nižja od minimalnih ocen pri drugih rekvizitih, kar tudi zmanjša povprečno oceno E pri traku. Če pa pogledamo maksimalno oceno pa vidimo da je ravno trak eden izmed najvišje ocenjenih. Iz tukaj lahko sklepamo da vrhunske tekmovalke izvajajo svoje sestave s približno enakimi odbitki ne glede na rekvizit.
 
+***
+
+<br>
+**4. graf** prikazuje vpliv ocene D na oceno E pri izraelski tekmovalki.
+<br>
+```{r graf5, echo=FALSE, fig.align='center'}
+graf5
+```
+<br>
+Na grafih vidimo da je Linoy tekom olimpijskega cikla napredovala tako v oceni D kot E. Padec ocene E pri sestavi s trakom na tekmovanju v Bakuju je posledica padca rekvizita, manjša ocena E v kijevu pa je posledica tako visoke težavnosti sestave. Vidimo torej da se klub morebitnem padcu ocene E pri traku še vseeno izplača otežiti tekmovalne sestave.
+<br>
+
+***
+
+<br>
 Spodnji zemljevid prikazuje države z tekmovalkami v finalih.
+<br>
+
+```{r zemljevidi, message=FALSE, warning=FALSE, include=FALSE, results='hide'}
+source("vizualizacija/zemljevidi.r", encoding="UTF-8")
+```
 
 ```{r zemljevid_najvisjih_ocen, echo=FALSE, message=FALSE, warning=FALSE,fig.align='center', fig.cap='Države z najvišjo oceno v finalih'}
  zemljevid_najvisjih_ocen
 ```
 
-***
+<br>
+Zemljevid nam prikazuje katere države so imele tekmovalko v finalih in kakšno oceno so dosegle. Za najvišje uvrščene države (Rusija, Bulgarija, Izrael, Belorusija) nam zemljevid prikazuje tudi katera je njihova najuspešnejša predstavnica. 
 
-
-
-# Napredna analiza podatkov
-
-```{r analiza, echo=FALSE, message=FALSE}
-source("analiza/analiza.r", encoding="UTF-8")
-```
-
-Spodnji graf prikazuje povezavo med številom naselij in površino občine.
-
-```{r graf, echo=FALSE, fig.align='center', fig.cap='Povezava med številom naselij in površino občine'}
-ggplot(inner_join(obcine, data.frame(obcina=names(skupine),
-                                     skupina=factor(skupine)), by="obcina")
-, aes(x=povrsina, y=naselja, color=skupina, size=prebivalci/1000)) + geom_point() +
-  ggtitle("Število naselij glede na površino občine") +
-  xlab(expression("Površina (km"^2 * ")")) + ylab("Št. naselij") +
-  guides(color=guide_legend(title="Skupina"),
-         size=guide_legend(title="Prebivalci (* 1000)"))
-```
+<br>
 
 ***
 
-#```{r shiny, echo=FALSE}
-#shinyAppDir("shiny", options=list(width="100%", height=600))
+
+
+## Napredna analiza podatkov
+
+```{r analiza, message=FALSE, warning=FALSE, include=FALSE}
+source("analiza/analiza.r", encoding = "UTF-8")
 ```
+<br>
+V razdelku analize si bomo poskusili odgovoriti na naslednja vprašanja:
+
+1. Kako visoko oceno lahko pričakujemo na tekmovanjih v skupinskih sestavah v letu 2021?
+
+2. Kako lahko razvrstimo države, ki jih zastopajo tekmovalke v skupinskih sestavah, v skupine odvisne od ocene E in D?
+
+3. Katere tekmovalke so bolj spretne z rekvizitom in katere imajo boljšo tehniko težin s telesom?
+
+4. S katerim rekvizitom so posamezne tekmovalke bolj spretne?
+
+5. Kakšno povprečno oceno lahko pričakujemo za vrhunske tekmovalke na Olimpijskih igrah?
+ 
+***
+
+<br>
+```{r predikcija_skupinske, echo=FALSE, fig.align='center'} 
+predikcija_skupinske
+```
+<br>
+<!--, fig.cap='linearna regresija'-->
+
+S pomočjo linearne regresije smo pokazali kako bo dvig ocene D vplival na oceno E. Za skupinske vaje s kombiniranim rekvizitom opazimo da je zvišanje težavnosti povzročilo padec ocene E. Zavedati se moramo da so bili rezultati vzeti iz tekmovanja v Bakuju in Kijevu, kjer je v finalih nastopilo manj vrhunskih ekip. Pri žogah lahko opazimo da se je klub povečanju ocene D zvišala tudi izvedbena ocena. Z rdečima pikama sta prikazani pričakovani vrednosti E za oceni D 32 in 35 točk. 
+
+***
+
+<br>
+```{r dendrogg_skupinske, echo=FALSE, fig.align='left'}
+dendrogg_skupinske
+```
+<br>
+S pomočjo hierarhičnega razvršanja smo države, ki so jih zastopale tekmovalke v skupinskih sestavah, razdelili v tri skupine glede na doseženo oceno D in E.
+<br>
+
+```{r grupiranje_skupinske3, echo=FALSE, fig.align='right'}
+grupiranje_skupinske3
+```
+<br>
+
+**1. SKUPINA:** ocena D med 18.2 in 21.1 in ocena E med 7.35 in 8.75.
+V to skupino so se uvrstile tekmovalke z obema sestavama iz tekmovanja v Bakuju: Bulgarija, Japonska, Kitajska, Izrael in Rusija. Ter z eno sestavo (kiji+obroč): Italija, Azerbajdžan in Belorusija.
+
+**2. SKUPINA:** ocena D med 18.5 in 21.6 in ocena E 5.7 in 6.8.
+V to skupino so se uvrstile tekmovalke s sestavo z žogam iz tekmovanja v Bakuju: Italija, Belorusija in Ukrajina. Z sestavami iz tekmovanja v Kijevu: Estonija (kiji + obroč), Francija (žoge), Turčija(žoge).
+
+**3. SKUPINA:** ocena D med 23.00 in 27.1 in ocena E 6.25 in 8.25.
+V to skupino so se uvrstile tekmovalke z obema sestavama iz tekmovanju v Kijevu: Ukrajina, Israel, Azerbajdžan. Ter tekmovalke iz Francije (kiji + obroč), Estonije (žoge) in Turčije (kiji + obroč) s sestavo z mešenim rekvizitom. 
+
+S to analizo lahko vidimo da se je ocena D povečala a je za to ocena E malo nižja, kar pa je morda posledica odsotnosti vrhunskih tekmovalk na tejmovanju v Kijevu. Opazimo lahko tudi napredek Azerbajžanskih tekmovalk, ki so sedaj postale tudi morebitne kandidatke za doseganje odličja na olimpijskih igrah 2021.
+
+
+***
+
+<br>
+```{r dendrogg_ind, echo=FALSE, fig.align='center'}
+dendrogg_ind
+```
+<br>
+Tekmovalke smo razvrstili v skupine glede na ocene težin z rekvizitom (DA) in ocene težin s telesom (DA). S pomočjo določanja skupin so nam različne metode in razdalje vrnile različno število skupin: 2, 3, 4, 5. Najbolj nadzorno grupiranje prikazuje graf ki loči tekmovalke v 5 skupin.
+<br>
+
+```{r grupiranje_ind5, echo=FALSE, fig.align='center'}
+grupiranje_ind5
+```
+<br> 
+
+**1. SKUPINA:** Tekmovalka 	Minagva Kaho iz Japonske s ponesrečeno sestavo s trakom.
+
+**2. SKUPINA:** Tekmovalke, ki so bolj spretne z rekvizitom kot s telesom in nekatere tekmovalke z rezultatom iz tekmovanja v Bakuju, ki imajo slabše težine s telesom in težine z rekvizitom, kot njihove sotekmovalke.
+
+**3. SKUPINA:** tekmovalke z visoko vrednostjo težin s telesom. Med njimi ima najvišjo oceno DB 5.6, tekmovalka iz Ukrajine Vlada Nikolchenko.
+
+**4. SKUPINA:** Tekmovalke, ki so bile bolj spretne z rekvizitom na tekmi v Bakuju. Najvišjo oceno DA 9.9 je dosegla ruska tekmovalka Dina Averina.
+
+**5. SKUPINA:** Tekmovalke, ki so bile na tekmovanju v Bakuju izvedle boljše težine s telesom. Ponovno izstopa Vlada Nikolchenko z BD 5.9.
+
+***
+
+<br>
+```{r grupiranje_rekviziti, echo=FALSE, fig.align='center'}
+grupiranje_rekviziti
+```
+<br>
+S pomočjo metode k voditeljev smo tekmovalke razporedili v tri skupine glede na končne ocene njihovih sestav pri posameznih rekvizitih na tekmovanju v Kijevu. 
+
+
+***
+
+<br>
+```{r predikcija_graf_ind, echo=FALSE, fig.align='center'}
+predikcija_graf_ind
+```
+<br>
+S pomočjo linearne regresije smo prikazali rast ocene D in E za induvidualne tekmovalke, ter napovedali oceno E pri vrednosti D 17.5 in 18.0.
+
+<br>
+
+***
+
+
+## Shiny 
+<br>
+S pomočjo shiny-ja lahko bolje prikažemo rezultate za tekmovalke v skupinskih sestavah in si podrobneje pogledamo rezultate vsake tekmovalke v induvidualnih sestavah.
+<br>
+
+```{r shiny, echo=FALSE}
+shinyAppDir("shiny", options=list(width="100%", height=600))
+```
+
+***
+
+## Zaključek
+
+S pomočjo projekta :)
+
+  
