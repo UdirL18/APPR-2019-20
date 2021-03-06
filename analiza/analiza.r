@@ -74,7 +74,7 @@ napovedE_tabela_skupinske <- napovedEskupinske %>%
 #napovedE_tabela_skupinske %>% view
 
 skupinske_predikcija_napoved <- rbind(napovedE_tabela_skupinske, skupinske)
-skupinske_predikcija_napoved %>% view
+skupinske_predikcija_napoved #%>% view
 
 
 ########################################################################
@@ -227,7 +227,7 @@ dendrogg_skupinske <- ggplot(segment(ddata_skupinske)) +
   scale_y_reverse(expand = c(0.5, 0)) + 
   geom_text(
     data=ddata_skupinske$labels, 
-    aes(x=x, y=y, label=label, colour=drzava), hjust=0, size=2, nudge_y = 0.03, show.legend = FALSE) + #size pisava držav
+    aes(x=x, y=y, label=label, colour=drzava), hjust=0, size=3.5, nudge_y = 0.03, show.legend = FALSE) + #size pisava držav
   theme(axis.line.y=element_blank(),
         axis.ticks.y=element_blank(),
         axis.text.y=element_blank(),
@@ -254,6 +254,23 @@ p3 <- cutree(model_skupinske, k=3)
     #po vrstnem redu iz tabele skupinske nam pove v katero skupino gre posamezna država
 
 ##################################################################
+skupinske$drzava <- recode(skupinske$drzava 
+                          ,'Bulgaria' = 'BUL' 
+                          ,'Israel' = 'ISR' 
+                          ,'Italy' = 'ITA' 
+                          ,'Japan' = 'JPN' 
+                          ,'Russia' = 'RUS' 
+                          ,'Ukraine' = 'UKR' 
+                          ,'Belarus' = 'BLR' 
+                          ,'Azerbaijan' = 'AZE' 
+                          ,'Turkey' ='TUR'
+                          ,'China' = 'CHN' 
+                          ,'France' = 'FRA' 
+                          ,'Estonia' = 'EST' 
+                          )
+
+
+
 #----------------------------------
 #pikice pobarvane v barvah skupine
 #-----------------------------------
@@ -263,7 +280,7 @@ grupiranje_skupinske3 <- skupinske %>%
   geom_point() +
   geom_text_repel( # da se ne prekrivajo imena
     aes(label=drzava),
-    size=2,
+    size=3,
     color='black',
     nudge_x = 0.05,
     nudge_y = 0.05
@@ -350,8 +367,8 @@ dendrogg_ind <- ggplot(segment(ddata_ind)) +
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), size=0.01) +  #size debelina črt
   coord_flip()  + 
   scale_y_reverse(expand = c(0.5, 0)) + 
-  labs(title = "DENDROGRAF GRUPIRANJA INDUVIDUALNIH 
-  TEKMOVALK GLEDE NA BD IN AD")+
+  labs(title = "DENDROGRAM GRUPIRANJA INDUVIDUALNIH 
+  TEKMOVALK GLEDE NA DB IN DA")+
   geom_text(data=ddata_ind$labels, 
     aes(x=x, y=y, label=label, colour=tekmovalka), hjust=0, size=1.5, nudge_y = 0.03, show.legend = FALSE) + #size pisava tekmovalk
   theme(axis.line.y=element_blank(),
@@ -523,7 +540,7 @@ induvidualne_rekviziti <- ecg %>% #da ne pokvarimo podatkov
  
 
   
-view(induvidualne_rekviziti)
+#view(induvidualne_rekviziti)
   
 
 #-----------------------------
@@ -609,13 +626,42 @@ modelK_rekviziti$cluster
 #--------------------------------------------------------------
 require('ggrepel') #za overlapping
 
+ecg$tekmovalka <- recode(ecg$tekmovalka
+                                #KAJ JE = V KAJ ŽELIMO SPREMENITI
+                               ,"ASHRAM Linoy" =  "ASHRAM" 
+                               ,"ZELIKMAN Nicol" = "ZELIKMAN" 
+                               ,"KALEYN Boryana" = "KALEYN"
+                               ,"SALOS Anastasiia" = "SALOS"
+                               ,"NIKOLCHENKO Vlada" = "NIKOLCHENKO"
+                               ,"HARNASKO Alina" = "HARNASKO"
+                               ,"TASEVA Katrin" = "TASEVA"          
+                               ,"JALILOVA Arzu" = "JALILOVA"
+                               ,"VERDES Andreea" = "VERDES"       
+                               ,"MELESHCHUK Yeva" = "MELESHCHUK"
+                               ,"STOJANOV Rejchl" = "STOJANOV" 
+                               ,"POLSTJANAJA Jelizaveta" = "POLSTJANAJA"
+                               ,"AGHAMIROVA Zohra" = "AGHAMIROVA"
+                               ,"PIGNICZKI Fanni" = "PIGNICZKI"
+                               ,"VEDENEEVA Ekaterina" = "VEDENEEVA"   
+                               ,"BOGDANOVA Viktoria" = "BOGDANOVA"
+                               ,"ICHIM Sonia" = "ICHIM"  
+                               ,"GUZ Anastasia" = "GUZ"        
+                               ,"STEPANKOVA Denisa" = "STEPANKOVA"
+                               ,"SOSTAKAITE Fausta" = "SOSTAKAITE"
+                               ,"TUNCEL Kamelya" = "TUNCEL"       
+                               ,"SMIRNOVA Elena" = "SMIRNOVA"
+                               ,"SAMBOL Lana" = "SAMBOL"
+                               ,"MARKOVIC Jovana" = "MARKOVIC"
+                               ,"KAHRIMAN Hana" = "KAHRIMAN")
+      
+
 grupiranje_rekviziti <- ecg %>% 
   mutate(skupina=modelK_rekviziti$cluster) %>%
   ggplot(aes(x=tekmovalka, y=koncna_ocena, col=skupina)) +
   facet_grid(.~rekvizit)+
   geom_point()+
  labs( y = "končna ocena", 
-      title = "GRAF SKUPIN INDUVIDUALNIH TEKMOVALK PO REKVIZITIH")+
+      title = "SKUPINE INDIVIDUALNIH TEKMOVALK ZA VSAK REKVIZIT")+
   geom_text_repel(  #dodamo imena tekmovalk, ki se ne prekrivajo
     aes(label=tekmovalka),
     size=1.5,
@@ -631,7 +677,7 @@ grupiranje_rekviziti <- ecg %>%
         ,axis.ticks.x = element_blank() #brez črtic na x osi
         ,axis.text.x = element_blank() #brez value na x osi
         ,axis.title.x = element_blank()
-        ,axis.text.y = element_text(size = 5)
+        ,axis.text.y = element_text(size = 6)
         ,panel.grid.major = element_blank() #navpične črte
         ,panel.grid.minor = element_blank() #vodoravne črte
         #,strip.background = element_blank() #ozadje pri ball clubs...
@@ -731,7 +777,7 @@ predikcija_graf_ind <- ggplot(induvidualne_predikcija_napoved, aes(x = D, y = E)
   geom_point(shape=1) + 
   geom_smooth(method=lm, formula=y~x) +
   geom_point(data=napovedE, aes(x=D, y=E), color='red', size=3)+
-  labs( title = "PREDIKCIJA POVPREČNE OCENE E ZA INDUVIDUALNE SESTAVE 
+  labs( title = "PREDIKCIJA POVPREČNE OCENE E ZA INDIVIDUALNE SESTAVE 
         NA OLIMPIJSKIH IGRAH 2021" )+
   theme_bw()+ #brez sivega ozadja
   theme(legend.position = "none" #brez legende
