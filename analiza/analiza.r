@@ -221,15 +221,20 @@ ddata_skupinske$labels$drzava <- skupinske$drzava[model_skupinske$order]
 
 dendrogg_skupinske <- ggplot(segment(ddata_skupinske)) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), size=0.01) +  #size debelina črt
+  labs( title = "DENDROGRAM DRŽAV GLEDE NA OCENO E IN D")+
+  theme(plot.title = element_text(hjust=0.5))+
   coord_flip()  + 
   scale_y_reverse(expand = c(0.5, 0)) + 
   geom_text(
     data=ddata_skupinske$labels, 
-    aes(x=x, y=y, label=label, colour=drzava), hjust=0, size=2, nudge_y = 0.03) + #size pisava držav
+    aes(x=x, y=y, label=label, colour=drzava), hjust=0, size=2, nudge_y = 0.03, show.legend = FALSE) + #size pisava držav
   theme(axis.line.y=element_blank(),
         axis.ticks.y=element_blank(),
         axis.text.y=element_blank(),
         axis.title.y=element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.x=element_blank(),
         panel.background=element_rect(fill="white"),
         panel.grid=element_blank())
 print(dendrogg_skupinske)
@@ -345,14 +350,18 @@ dendrogg_ind <- ggplot(segment(ddata_ind)) +
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), size=0.01) +  #size debelina črt
   coord_flip()  + 
   scale_y_reverse(expand = c(0.5, 0)) + 
-  labs(title = "DENDROGRAF GRUPIRANJA INDUVIDUALNIH TEKMOVALK GLEDE NA BD IN AD")+
-  geom_text(
-    data=ddata_ind$labels, 
-    aes(x=x, y=y, label=label, colour=tekmovalka), hjust=0, size=2, nudge_y = 0.03) + #size pisava tekmovalk
+  labs(title = "DENDROGRAF GRUPIRANJA INDUVIDUALNIH 
+  TEKMOVALK GLEDE NA BD IN AD")+
+  geom_text(data=ddata_ind$labels, 
+    aes(x=x, y=y, label=label, colour=tekmovalka), hjust=0, size=1.5, nudge_y = 0.03, show.legend = FALSE) + #size pisava tekmovalk
   theme(axis.line.y=element_blank(),
         axis.ticks.y=element_blank(),
         axis.text.y=element_blank(),
         axis.title.y=element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.x=element_blank(),
+        #legend.key = element_blank(),
         panel.background=element_rect(fill="white"),
         panel.grid=element_blank(),
         plot.title = element_text(hjust=0.5))
@@ -490,7 +499,8 @@ grupiranje_ind5 <- wcg %>%
     nudge_y = 0.05
   )+
   theme_minimal()+
-  labs(title = "GRUPIRANJE DRŽAV PO VREDNOSTI DB IN DA INDUVIDUALNIH SESTAV")+
+  labs(title = "GRUPIRANJE DRŽAV PO VREDNOSTI 
+       DB IN DA INDUVIDUALNIH SESTAV")+
   theme(plot.title = element_text(hjust=0.5))
 
 print(grupiranje_ind5)
@@ -721,7 +731,8 @@ predikcija_graf_ind <- ggplot(induvidualne_predikcija_napoved, aes(x = D, y = E)
   geom_point(shape=1) + 
   geom_smooth(method=lm, formula=y~x) +
   geom_point(data=napovedE, aes(x=D, y=E), color='red', size=3)+
-  labs( title = "PREDIKCIJA POVPREČNE OCENE E ZA INDUVIDUALNE SESTAVE NA OLIMPIJSKIH IGRAH 2021" )+
+  labs( title = "PREDIKCIJA POVPREČNE OCENE E ZA INDUVIDUALNE SESTAVE 
+        NA OLIMPIJSKIH IGRAH 2021" )+
   theme_bw()+ #brez sivega ozadja
   theme(legend.position = "none" #brez legende
         ,plot.title = element_text(hjust=0.5)#naslovna na sredini
