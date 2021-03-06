@@ -8,7 +8,7 @@
 #-Na zemljevid lahko dodaste še oznake območij in narišete še nekaj točk s svojimi oznakami (npr. za mesta). 
 #-Podatki o koordinatah točk naj bodo v priloženi datoteki CSV.
 
-#!!!!idk če imam to
+#!!!!uredi, tistih obrob držav potem nisem uporabila-zbriši to
 
 #===========================================================================================
 #KNJIŽNICE
@@ -204,6 +204,7 @@ max_ocena$najvisja_ocena <- "TRUE" #dodamo stolpec najvišja_ocena in ga nastavi
 #--------------------------------------------------------------------------------------------------------
 map.world_joined_max <- left_join(map.world_joined, max_ocena, by = c('long' = 'long','lat' = 'lat', 'group' = 'group', 'order' = 'order', 'region'= 'region', 'subregion' = 'subregion', 'tekmovalka' = 'tekmovalka', 'tekma' = 'tekma', 'rekvizit' = 'rekvizit', 'E' = 'E', 'D' = 'D', 'Pen.' = 'Pen.', 'koncna_ocena' = 'koncna_ocena',  'fill_flg' = 'fill_flg'))
 
+#kaj če moram tukajdat koncna_ocena ne najvisja ocena
 map.world_joined_max <- map.world_joined_max %>% 
   mutate(najvisja_ocena = ifelse(is.na(najvisja_ocena),F,T))
 #is.na vrne TRUE, če je na danem mestu NA, sicer FALSE
@@ -267,8 +268,9 @@ zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long, y = lat,
   scale_fill_gradientn(colours = c('green1','yellow','orange','red')
                        ,breaks = c(10, 16, 18, 20, 22, 24, 26))+
   #scale_fill_manual(values = c("red", "grey", "seagreen3")) +
-  guides(fill = guide_legend(reverse = T)) +
-  labs(fill = 'končna ocena'
+  guides(fill = guide_legend(reverse = T)
+         ,color = FALSE) +
+  labs(fill = 'Končna ocena'
        ,color = 'najvišja ocena '
        ,title = 'DRŽAVE Z NAJVIŠJO OCENO V FINALIH'
        ,x = NULL
@@ -287,21 +289,21 @@ zemljevid_najvisjih_ocen <- ggplot(map.world_joined_max, aes( x = long, y = lat,
   ) +
   annotate(geom = 'text'
            ,label = 'Source: FIG https://www.gymnastics.sport/site/events/searchresults.php#filter'
-           ,x = 18, y = 100
+           ,x=-Inf
+           ,y=-Inf
+           ,hjust=0
+           ,vjust=0
+           #,x = 18, y = 100
            ,size = 3
            ,family = 'Gill Sans'
            ,color = '#CCCCCC'
-           ,hjust = 'left'
+           #,hjust = 'left'
   )+
 geom_text(data = vrstice_tekmovalka, aes(x = long, y = lat, label = tekmovalka), 
            size = 3, col = "#CCCCCC", fontface = "bold")
 
 
 print(zemljevid_najvisjih_ocen)
-
-
-
-
 
 
 
