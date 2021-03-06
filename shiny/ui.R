@@ -1,17 +1,25 @@
 library(shiny)
 
 shinyUI(fluidPage(
-  
-  titlePanel("Slovenske občine"),
-  
-  tabsetPanel(
-      tabPanel("Velikost družine",
-               DT::dataTableOutput("druzine")),
-      
-      tabPanel("Število naselij",
-               sidebarPanel(
-                  uiOutput("pokrajine")
-                ),
-               mainPanel(plotOutput("naselja")))
-    )
-))
+  navbarPage("Analiza rezultatov tekmovanj ritmične gimnastike",
+             
+             
+             tabPanel("Tekmovalke",
+                      titlePanel("Rezultati za induvidualne tekmovalke"),
+                      sidebarPanel(
+                        selectInput(inputId = "tekmovalka",
+                                    label = "Izberite tekmovalko",
+                                    choices = unique(induvidualne$tekmovalka))),
+                      mainPanel(plotOutput("tekmovalka"))),
+             
+             
+             tabPanel("Skupinske sestave",
+                      titlePanel("Rezultati za skupinske sestave"),
+                      sidebarPanel(
+                        selectInput(inputId = "tekma",
+                                    label = "Izberite tekmo",
+                                    choices = unique(skupinske$tekma))),
+                      mainPanel(plotOutput("tekma")))
+             
+             
+  )))
