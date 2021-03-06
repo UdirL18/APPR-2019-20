@@ -1,24 +1,37 @@
 library(shiny)
 
+
 shinyServer(function(input, output) {
-  output$druzine <- DT::renderDataTable({
-    druzine %>% spread(key="velikost.druzine", value="stevilo.druzin") %>%
-      rename(`Občina`=obcina)
+  
+  output$tekmovalka <- renderPlot({
+    graf.tekmovalka <- ggplot(induvidualne %>% filter(tekmovalka == input$tekmovalka)) +
+      aes(x=D, y=E, color=rekvizit, shape = tekma) +
+      geom_point() +
+      labs( x='D', y = 'E') + 
+      scale_fill_manual(values=c('lightblue', 'purple', 'blue', 'black')) + 
+      #scale_x_continuous(breaks = seq(2009, 2018, by=1), limits = c(2008,2019)) +
+      theme_minimal()
+    
+    print(graf.tekmovalka)
   })
   
-  output$pokrajine <- renderUI(
-    selectInput("pokrajina", label="Izberi pokrajino",
-                choices=c("Vse", levels(obcine$pokrajina)))
-  )
-  output$naselja <- renderPlot({
-    main <- "Pogostost števila naselij"
-    if (!is.null(input$pokrajina) && input$pokrajina %in% levels(obcine$pokrajina)) {
-      t <- obcine %>% filter(pokrajina == input$pokrajina)
-      main <- paste(main, "v regiji", input$pokrajina)
-    } else {
-      t <- obcine
-    }
-    ggplot(t, aes(x=naselja)) + geom_histogram() +
-      ggtitle(main) + xlab("Število naselij") + ylab("Število občin")
+  output$tekma <- renderPlot({
+    graf.skupinske <- ggplot(skupinske %>% filter(tekma == input$tekma), aes(x=D, y=E, color=rekvizit)) +
+      geom_point() +
+      labs( x='D', y = 'E') + 
+      #scale_fill_manual(values=c('lightblue', 'purple')) + 
+      scale_x_continuous(breaks = seq(18, 26, by=1)) +
+      geom_text_repel(
+        aes(label=drzava),
+        size=2,
+        color='black',
+        nudge_x = 0.05,
+        nudge_y = 0.05
+      )+
+      theme_minimal()
+    
+    print(graf.skupinske)
   })
+  
+  
 })
