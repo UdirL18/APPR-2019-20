@@ -182,7 +182,7 @@ induvidualne_5 <- induvidualne_viz[c(5,15,25),]
 induvidualne_5 %>%
   select(-c(D, koncna_ocena, ranking)) ->induvidualne_graf2#%>%
   #table() 
-View(induvidualne_graf2)
+#View(induvidualne_graf2)
 
 #kr neki
 #ggplot(induvidualne_graf2, aes(x=tekma, y=delez)) +
@@ -274,8 +274,8 @@ graf3 <- ggplot(data = wcg_graf3, mapping = aes(x = DA, y = tekmovalka, color = 
   #------------------------------------------------------------------
   # PREGLEDNEJŠA X OS
   #------------------------------------------------------------
-  scale_x_continuous(breaks=c(2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10))+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+  scale_x_continuous(breaks=c(3, 4, 5, 6, 7, 8, 9, 10))+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8),
         #------------------------------------------------------------
         #DA JE NASLOV NA SREDINI
         #------------------------------------------------------------
@@ -424,8 +424,7 @@ induv_graf5$tekma <- recode(induv_graf5$tekma
 #---------------------------------------------------------------------------------------
 #GRAF
 #---------------------------------------------------------------------------------------
-graf5 <- ggplot(induv_graf5, aes(x = tekma, y = vrednosti, colour = ocena))
-graf5 + 
+graf5 <- ggplot(induv_graf5, aes(x = tekma, y = vrednosti, colour = ocena)) + 
   geom_point() + 
   facet_grid(.~rekvizit) +
   #------------------------------------------------------------------------
@@ -455,5 +454,9 @@ theme_bw() +
   #-----------------------------------------------------------------------------
   # NASLOV
   #-----------------------------------------------------------------------------
-  ggtitle("ALI JE DVIG OCENE D VPLIVAL NA POVEČANJE ODBITKA E PRI TEKMOVALKI LINOY ASHRAM")+
+  ggtitle("ALI JE DVIG OCENE D VPLIVAL NA POVEČANJE 
+          ODBITKA E PRI TEKMOVALKI LINOY ASHRAM")+
   theme(plot.title = element_text(hjust=0.5))
+print(graf5)
+
+
