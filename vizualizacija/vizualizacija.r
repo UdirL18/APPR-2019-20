@@ -115,7 +115,7 @@ graf1 <- ggplot(dat_graf1, aes(x = ranking, y = Value, fill = Stat)) +
   #NASLOV, TEXT NA OSEH
   #---------------------------------------------------------
   ggtitle("DVIG OCEN SKOZI OLIMPIJSKI CIKEL 2017 - 2021")+
-  #xlab("Najvišje ocenjene sestave") +
+  xlab("mesto uvrstitve") +
   ylab("ocena")+
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   geom_text(aes(label = value, #navpična vrednost na grafu
@@ -140,7 +140,7 @@ graf1 <- ggplot(dat_graf1, aes(x = ranking, y = Value, fill = Stat)) +
         #NAPISI PRI X OSI, IZBRIS Y OSI 
         #----------------------------------------------------------------------
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-        axis.title.x = element_blank(),
+        #axis.title.x = "mesto uvrstitve",
         axis.text.y=element_blank(),
         axis.ticks=element_blank(), #izbris črtic na oseh
         #----------------------------------------------------------------------
@@ -454,7 +454,7 @@ theme_bw() +
   #-----------------------------------------------------------------------------
   # NASLOV
   #-----------------------------------------------------------------------------
-  ggtitle("ALI JE DVIG OCENE D VPLIVAL NA POVEČANJE 
+  ggtitle("VPLIV DVIGA OCENE D NA POVEČANJE 
           ODBITKA E PRI TEKMOVALKI LINOY ASHRAM")+
   theme(plot.title = element_text(hjust=0.5))
 print(graf5)
