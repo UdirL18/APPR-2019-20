@@ -230,13 +230,24 @@ V razdelku analize si bomo poskusili odgovoriti na naslednja vprašanja:
 ***
 
 <br>
-```{r predikcija_skupinske, echo=FALSE, fig.align='center'} 
-predikcija_skupinske
+```{r predikcija_skupinske_obroci_kiji, echo=FALSE, fig.align='center'} 
+predikcija_skupinske_obroci_kiji
 ```
 <br>
-<!--, fig.cap='linearna regresija'-->
 
 S pomočjo **linearne regresije** smo pokazali kako bo dvig ocene D vplival na oceno E. Za skupinske vaje s kombiniranim rekvizitom opazimo, da je zvišanje težavnosti povzročilo padec ocene E. Zavedati se moramo, da so bili rezultati vzeti iz tekmovanja v Bakuju in Kijevu, kjer je v finalih nastopilo manj vrhunskih ekip. Pri žogah lahko opazimo, da se je klub povečanju ocene D zvišala tudi izvedbena ocena. Z rdečima pikama sta prikazani pričakovani vrednosti E za oceni D, 32 in 35 točk. 
+
+<br>
+
+```{r predikcija_skupinske_zoge, echo=FALSE, fig.align='center'} 
+predikcija_skupinske_zoge
+```
+
+<br>
+
+Za skupinske sestave vidimo, da se kljub povečanju D povečuje tudi ocena E. Z rdečima pikama sta prikazani pričakovani vrednosti E za oceni D, 32 in 35 točk.
+
+<br> 
 
 ***
 
@@ -245,7 +256,18 @@ S pomočjo **linearne regresije** smo pokazali kako bo dvig ocene D vplival na o
 dendrogg_skupinske
 ```
 <br>
-S pomočjo **hierarhičnega razvršanja** smo države, ki so jih zastopale tekmovalke v skupinskih sestavah, razvrstili v tri skupine glede na doseženo oceno D in E.
+S pomočjo **hierarhičnega razvršanja** smo države, ki so jih zastopale tekmovalke v skupinskih sestavah, razvrstili v tri skupine glede na doseženo oceno D in E. 
+
+**OPOMBA:** številke ob državah pomenijo:
+
+* 1 - 8 Baku 2019, 3 obroči + 4 kiji
+
+* 9 - 16 Baku 2019, 5 žog
+
+* 17 - 22 Kijev, 3 obroči + 4 kiji
+
+* 23 - 28 Kijev, 5 žog
+
 <br>
 
 ```{r grupiranje_skupinske3, echo=FALSE, fig.align='center'}
@@ -323,6 +345,19 @@ shinyAppDir("shiny", options=list(width="100%", height=600))
 
 ## Zaključek
 
-S pomočjo projekta :)
+S pomočjo projekta smo z uporabo različnih in analiz ter vizalizacij opazili:
+
+* Vrednost končne ocene se je tekom olimpijskega cikla zviševala na račun povečanja ocene DA.
+
+* Kljub zvišanju težavnosti sestav se izvedbeni odbitki niso povečali.
+
+* Za mlade tekmovalke se je izvedbena ocena E zviševala tekom olimpijskega cikla.
+
+* Vrhunske tekmovalke prejemajo enako visoke ocene za izvedbo E pri vseh rekvizitih, ocena D pa je nižja pri traku.
+
+* Vedno bolj je pomembno delo z rekvizitom in manj težine s telesom.
+
+* Pri skupinskih sestavah je nov pravilnik povečal možnosti nestabilnosti tekmovalk.
+
 
   
