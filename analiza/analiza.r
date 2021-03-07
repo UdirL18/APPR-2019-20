@@ -48,8 +48,8 @@ ggplot(skupinske, aes(x = D, y = E, col = tekma)) +
 #---------------------------------------------------------------
 # MODEL
 #--------------------------------------------------------------
-model_skupinske <- lm(E ~ D, data=skupinske)
-
+model_skupinske_obroci_kiji <- lm(E ~ D, data=skupinske%>%filter(rekvizit == "3 obroči + 4 kiji"))
+model_skupinske_zoge <- lm(E ~ D, data=skupinske%>%filter(rekvizit == "5 žog"))
 
 #------------------------------------------------------------------
 # IZRIS LINEARNEGA MODELA
@@ -64,39 +64,50 @@ ggplot(skupinske, aes(x = D, y = E)) +
 # PREDIKCIJA. Kakšna bo E ko bodo D dvignile na 32, 35
 #-----------------------------------------------------------------
 novDskupinske <- data.frame(D=c(32, 35))
-predict(model_skupinske, novDskupinske) #7.518193 7.536600 
-napovedEskupinske <- novDskupinske %>% mutate(E=predict(model_skupinske, .)) 
+predict(model_skupinske_obroci_kiji, novDskupinske) #5.315866 4.698013 
+predict(model_skupinske_zoge, novDskupinske) #8.735773 9.121857
+napovedEskupinske_obroci_kiji <- novDskupinske %>% mutate(E=predict(model_skupinske_obroci_kiji, .))
+napovedEskupinske_zoge <- novDskupinske %>% mutate(E=predict(model_skupinske_zoge, .))
 
-napovedE_tabela_skupinske <- napovedEskupinske %>% 
-  mutate(drzava = "napoved", tekma = 2021, rekvizit = c("3 obroči + 4 kiji", "5 žog"), Pen.= 0.00, koncna_ocena = c(7.518193+32, 7.536600+35) )  
+#napovedE_tabela_skupinske <- napovedEskupinske %>% 
+#  mutate(drzava = "napoved", tekma = 2021, rekvizit = c("3 obroči + 4 kiji", "5 žog"), Pen.= 0.00, koncna_ocena = c(7.518193+32, 7.536600+35) )  
 
-#napovedEskupinske %>% View
+#napovedEskupinske_obroci_kiji %>% View
+#napovedEskupinske_zoge %>% View
 #napovedE_tabela_skupinske %>% view
 
-skupinske_predikcija_napoved <- rbind(napovedE_tabela_skupinske, skupinske)
-skupinske_predikcija_napoved #%>% view
+#skupinske_predikcija_napoved <- rbind(napovedE_tabela_skupinske, skupinske)
+#skupinske_predikcija_napoved #%>% view
 
 
 ########################################################################
 #----------------
 # izris napovedi
 #----------------
-predikcija_skupinske <- ggplot(skupinske_predikcija_napoved, aes(x = D, y = E)) + 
+predikcija_skupinske_obroci_kiji <- ggplot(skupinske%>%filter(rekvizit == "3 obroči + 4 kiji"), aes(x = D, y = E)) + 
   geom_point(shape=1) + 
-  geom_smooth(method=lm, formula=y~x) +
-  geom_point(data=napovedEskupinske, aes(x=D, y=E), color='red', size=3)+
-  labs( title = "PREDIKCIJA OCENE E NA OLIMPIJSKIH IGRAH 2021 ZA SKUPINSKE SESTAVE" )+
-  facet_grid(.~rekvizit)+
+  geom_smooth(method=lm, formula=y~x, fullrange = TRUE) + 
+  geom_point(data=napovedEskupinske_obroci_kiji, aes(x=D, y=E), color='red', size=3)+
+  labs(title = "PREDIKCIJA OCENE E NA OLIMPIJSKIH IGRAH 2021 ZA SKUPINSKE SESTAVE
+  V SESTAVI S KOMBINIRANIM REKVIZITOM" )+
   theme_bw()+ #brez sivega ozadja
-  theme(legend.position = "none" #brez legende
-        ,plot.title = element_text(hjust=0.5)#naslovna na sredini
-        
-  )
+  theme(legend.position = "none", plot.title = element_text(hjust=0.5))#naslovna na sredini
+      
 
-print(predikcija_skupinske)
+print(predikcija_skupinske_obroci_kiji)
 
 
+predikcija_skupinske_zoge <- ggplot(skupinske%>%filter(rekvizit == "5 žog"), aes(x = D, y = E)) + 
+  geom_point(shape=1) + 
+  geom_smooth(method=lm, formula=y~x, fullrange = TRUE) + 
+  geom_point(data=napovedEskupinske_zoge, aes(x=D, y=E), color='red', size=3)+
+  labs(title = "PREDIKCIJA OCENE E NA OLIMPIJSKIH IGRAH 2021 ZA SKUPINSKE SESTAVE
+  V SESTAVI Z ŽOGAMI" )+
+  theme_bw()+ #brez sivega ozadja
+  theme(legend.position = "none", plot.title = element_text(hjust=0.5))#naslovna na sredini
 
+
+print(predikcija_skupinske_zoge)
 
 
 
@@ -220,7 +231,7 @@ ddata_skupinske$labels$label <- paste(skupinske$drzava[model_skupinske$order], d
 ddata_skupinske$labels$drzava <- skupinske$drzava[model_skupinske$order]
 
 dendrogg_skupinske <- ggplot(segment(ddata_skupinske)) + 
-  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), size=0.01) +  #size debelina črt
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), size=1) +  #size debelina črt
   labs( title = "DENDROGRAM DRŽAV GLEDE NA OCENO E IN D")+
   theme(plot.title = element_text(hjust=0.5))+
   coord_flip()  + 
