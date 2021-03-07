@@ -66,7 +66,7 @@ wcg_baku_skupinske <- rbind(tabela_baku_skupinske_kiji_obroci, tabela_baku_skupi
 sl <- locale("sl", decimal_mark=".", grouping_mark=";") 
 
 kijev_zoge <-
-  read_csv("podatki/Kyiv RG rezultati.csv", skip = 153, n_max = 6, locale=locale(encoding="Windows-1250"))[,c(3:7)]
+  read_csv("podatki/kyiv_RG_rezultati.csv", skip = 153, n_max = 6, locale=locale(encoding="Windows-1250"))[,c(3:7)]
 
 kijev_zoge %>% 
   rename(drzava = 1, E = 2, D = 3, Pen.= 4, koncna_ocena = 5) %>% #preimenujemo stolpce
@@ -77,7 +77,7 @@ kijev_zoge %>%
 
 #------------------------------------------------------------------------------------------------------------------
 kijev_kiji_obroci <-
-  read_csv("podatki/Kyiv RG rezultati.csv", skip = 170, n_max = 6, locale=locale(encoding="Windows-1250"))[,c(3:7)]
+  read_csv("podatki/kyiv_RG_rezultati.csv", skip = 170, n_max = 6, locale=locale(encoding="Windows-1250"))[,c(3:7)]
 
 kijev_kiji_obroci %>% 
   rename(drzava = 1, E = 2, D = 3, Pen.= 4, koncna_ocena = 5) %>% #preimenujemo stolpce
@@ -115,10 +115,5 @@ skupinske$drzava <- recode(skupinske$drzava
 #View(skupinske)
 
 
-################################################################################################################
-#KAKO SMO TO UVOZILI NA PREDAVANJIH
-url_wiki <- "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)"
-wiki <- read_html(url_wiki)
-wiki %>% html_nodes(xpath = "//table[@class = 'wikitable sortable']") %>% 
-  .[[1]] %>% html_table() %>% View()
+
 
