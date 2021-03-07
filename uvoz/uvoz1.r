@@ -1,7 +1,8 @@
 #UvOZ PODATKOV
 #=============================================================================================================
-#UVOZ CSV DATOTEK - INDUVIDUVALNE SESTAVE
+#UVOZ CSV DATOTEK - INDIVIDUVALNE SESTAVE
 #=============================================================================================================
+#opomba: nekateri smo nepismeni in smo individualne pisli kot induvidualne :) 
 
 #naložili smo data, z >class(sofia_hoop) smo preverili da je res data.frame 
 #(dvodimenzionalna tabela iz vrstic in stolpcev, vsak stolpec je enega tipa),
@@ -21,8 +22,8 @@
 #===========================================================================================================
 library(dplyr)
 library(tidyr) #za funkciji gather() in spread()
-library(readr)
-library(naniar)
+library(readr) #read_csv,
+library(naniar) #replace_with_na_at
 
 
 #==============================================================================================================
@@ -65,19 +66,19 @@ colnames(baku_ribbon) <- c("tekmovalka","drzava","DB", "DA", "EA", "ET", "Pen.")
 #KIJEV
 #-----------------------------------------------------------------------------------------------------------------
 kijev_hoop<- 
-  read_csv("podatki/kyiv RG rezultati.csv", skip = 6, n_max= 25, locale=locale(encoding="Windows-1250"))[,c(2:7)]
+  read_csv("podatki/kyiv_RG_rezultati.csv", skip = 6, n_max= 25, locale=locale(encoding="Windows-1250"))[,c(2:7)]
 colnames(kijev_hoop) <- c("tekmovalka","drzava","E", "D", "Pen.", "koncna_ocena")
 
 kijev_ball<- 
-  read_csv("podatki/kyiv RG rezultati.csv", skip = 43, n_max= 25, locale=locale(encoding="Windows-1250"))[,c(2:7)]
+  read_csv("podatki/kyiv_RG_rezultati.csv", skip = 43, n_max= 25, locale=locale(encoding="Windows-1250"))[,c(2:7)]
 colnames(kijev_ball) <- c("tekmovalka","drzava","E", "D", "Pen.", "koncna_ocena")
 
 kijev_clubs<- 
-  read_csv("podatki/kyiv RG rezultati.csv", skip = 80, n_max= 25, locale=locale(encoding="Windows-1250"))[,c(2:7)]
+  read_csv("podatki/kyiv_RG_rezultati.csv", skip = 80, n_max= 25, locale=locale(encoding="Windows-1250"))[,c(2:7)]
 colnames(kijev_clubs) <- c("tekmovalka","drzava","E", "D", "Pen.", "koncna_ocena")
 
 kijev_ribbon<- 
-  read_csv("podatki/kyiv RG rezultati.csv", skip = 116, n_max= 25, locale=locale(encoding="Windows-1250"))[,c(2:7)]
+  read_csv("podatki/kyiv_RG_rezultati.csv", skip = 116, n_max= 25, locale=locale(encoding="Windows-1250"))[,c(2:7)]
 colnames(kijev_ribbon) <- c("tekmovalka","drzava","E", "D", "Pen.", "koncna_ocena")
 
 
@@ -139,15 +140,14 @@ kijev_ribbon$tekma<-"2020 Kijev"
 #=============================================================================================================
 # uporabimo knjižnico library(naniar), replace_with_na_at nadomesti spremenljivke z NA če je dosežen pogoj
 # .vars = na katerem stolpcu uporabimo zamenjavo, 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!kaj je ~.x
 wcg <- rbind(baku_hoop, baku_ball, baku_clubs, baku_ribbon, sofia_hoop, sofia_ball, sofia_clubs, sofia_ribbon) %>% 
-  replace_with_na_at(.vars = c("Pen."), condition = ~.x >= 0) 
+  replace_with_na_at(.vars = c("Pen."), condition = ~.x >= 0)  
 
 #preuredimo še vrstni red stolpcev
 wcg <- wcg[c('tekmovalka', 'drzava', 'tekma', 'rekvizit', 'DB', 'DA', 'EA', 'ET', 'Pen.')]
   
 
-#v stolpcu pen. nekatere tekmovalke "nimajo podatka" v resnici le niso dobile odbitka zato te na nastavimo na 0
+#v stolpcu pen. nekatere tekmovalke "nimajo podatka" v resnici le niso dobile odbitka zato te NA nastavimo na 0
 wcg[is.na(wcg)] = 0
 #View(wcg)
 
@@ -166,7 +166,7 @@ ecg <- ecg[c('tekmovalka', 'drzava', 'tekma', 'rekvizit', 'E', 'D', 'Pen.', 'kon
 
 
 #=============================================================================================================
-#ZDRUŽITEV TABEL wcg IN ecg V SKUPNO TABELO induvidualne
+#ZDRUŽITEV TABEL wcg IN ecg V SKUPNO TABELO individualne
 #=============================================================================================================
 #če bi želeli združit tabeli bi morali v wcg seštet EA 7 in  ET 8 da dobimo E nato DB in DA da dobimo D
 wcg_D_E <- wcg
@@ -189,4 +189,5 @@ finali_kijev <- ecg %>%
   ungroup() 
 
 induvidualne_finali <- rbind(finali_kijev, wcg_D_E)
-View(induvidualne_finali)
+#View(induvidualne_finali)
+
