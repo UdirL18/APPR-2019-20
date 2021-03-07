@@ -266,16 +266,17 @@ wcg_graf3$tekmovalka <- recode(wcg_graf3$tekmovalka
 #--------------------------------------------------------------------------------------
 #GRAF
 #--------------------------------------------------------------------------------------
-graf3 <- ggplot(data = wcg_graf3, mapping = aes(x = DA, y = tekmovalka, color = tekma)) +
-  geom_point()+
+graf3 <- ggplot(data = wcg_graf3, mapping = aes(x = tekmovalka, y = DA, fill = tekma)) +
+  geom_col(position = "dodge")+
   ggtitle("VREDNOSTI TEŽIN Z REKVIZITOM AD")+ 
-  labs(x="vrednosti AD", y="tekmovalke") + 
-  facet_wrap( ~ rekvizit, ncol=8) +
+  labs(x="tekmovalke", y="DA") + 
+  facet_wrap( ~ rekvizit, ncol=5) +
   #------------------------------------------------------------------
   # PREGLEDNEJŠA X OS
   #------------------------------------------------------------
-  scale_x_continuous(breaks=c(3, 4, 5, 6, 7, 8, 9, 10))+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8),
+  scale_y_continuous(breaks=c(2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10))+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1, size = 4.5),
         #------------------------------------------------------------
         #DA JE NASLOV NA SREDINI
         #------------------------------------------------------------
