@@ -345,7 +345,7 @@ shinyAppDir("shiny", options=list(width="100%", height=600))
 
 ## Zaključek
 
-S pomočjo projekta smo z uporabo različnih in analiz ter vizalizacij opazili:
+S pomočjo projekta smo z uporabo različnih analiz ter vizalizacij opazili:
 
 * Vrednost končne ocene se je tekom olimpijskega cikla zviševala na račun povečanja ocene DA.
 
@@ -358,6 +358,9 @@ S pomočjo projekta smo z uporabo različnih in analiz ter vizalizacij opazili:
 * Vedno bolj je pomembno delo z rekvizitom in manj težine s telesom.
 
 * Pri skupinskih sestavah je nov pravilnik povečal možnosti nestabilnosti tekmovalk.
+
+
+***
 
 
   

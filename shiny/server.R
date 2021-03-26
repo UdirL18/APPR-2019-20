@@ -1,8 +1,14 @@
 library(shiny)
 
-
+#------------------------------------------------------------------------------------
+#shinyServer ustvarjanja funkcije, ki uporabniške vnose preslikajo v različne vrste 
+#izhodnih podatkov.  
+#-------------------------------------------------------------------------------------
 shinyServer(function(input, output) {
-  
+  #----------------------------------------------------------------------------------
+  #renderPlot je reaktivna funkcija, ki lahko zajema vhodne podatke iz ui.R in ga vstavite v server.R.
+  #Nato informacije v okviru svoje funkcije aktivno posodablja.
+  #----------------------------------------------------------------------------------
   output$tekmovalka <- renderPlot({
     graf.tekmovalka <- ggplot(induvidualne %>% filter(tekmovalka == input$tekmovalka)) +
       aes(x=D, y=E, color=rekvizit, shape = tekma) +
@@ -37,41 +43,3 @@ shinyServer(function(input, output) {
  
 })
 
-
-
-#shinyServer(function(input, output) {
-#  
-#  output$rekvizit <- renderPlot({
-#    graf.rekvizit <- ecg %>% 
-#      mutate(skupina=modelK_rekviziti$cluster) %>%
-#      ggplot(aes(x=tekmovalka, y=koncna_ocena, col=skupina)) +
-#      geom_point()+
-#      labs( y = "končna ocena")+
-#      geom_text_repel(  #dodamo imena tekmovalk, ki se ne prekrivajo
-#        aes(label=tekmovalka),
-#        size=1.5,
-#        color='black',
-#        min.segment.length = 0, #črtica do vsake pikice
-#        #box.padding = 0.05,
-#        #nudge_x = 0.05,
-#        #nudge_y = 0.5
-#      )+
-#      scale_y_continuous(breaks=c(2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25))+
-#      theme_bw()+ #brez sivega ozadja
-#      theme(legend.position = "none" #brez legende
-#            ,axis.ticks.x = element_blank() #brez črtic na x osi
-#            ,axis.text.x = element_blank() #brez value na x osi
-#            ,axis.title.x = element_blank()
-#            ,axis.text.y = element_text(size = 6)
-#            ,panel.grid.major = element_blank() #navpične črte
-#            ,panel.grid.minor = element_blank() #vodoravne črte
-#            #,strip.background = element_blank() #ozadje pri ball clubs...
-#            #,panel.border = element_blank()
-#            ,plot.title = element_text(hjust=0.5)#naslovna sredini
-#            
-#      )
-#    
-#    print(graf.rekvizit)
-#  })
-#})  
-  

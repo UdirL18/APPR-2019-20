@@ -1,5 +1,6 @@
 library(shiny)
 
+#
 shinyUI(fluidPage(
   navbarPage("Analiza rezultatov tekmovanj ritmične gimnastike:",
              
@@ -22,29 +23,7 @@ shinyUI(fluidPage(
                       mainPanel(plotOutput("tekma")))
              
              
-             #tabPanel("Rekvizit",
-            #          titlePanel("SKUPINE INDIVIDUALNIH TEKMOVALK ZA VSAK REKVIZIT"),
-            #          sidebarPanel(
-            #            selectInput(inputId = "rekvizit",
-            #                        label = "Izberite rekvizit",
-            #                        choices = unique(ecg$rekvizit))),
-            #          mainPanel(plotOutput("rekvizit")))
              
              
   )))
 
-#shinyUI(fluidPage(
-#  navbarPage("SKUPINE INDIVIDUALNIH TEKMOVALK ZA VSAK REKVIZIT:",
-#             
-#             
-#             tabPanel("Rekvizit",
-#                      titlePanel("SKUPINE INDIVIDUALNIH TEKMOVALK ZA VSAK REKVIZIT"),
-#                      sidebarPanel(
-#                        selectInput(inputId = "rekvizit",
-#                                    label = "Izberite rekvizit",
-#                                    choices = unique(ecg$rekvizit))),
-#                      mainPanel(plotOutput("rekvizit"))),
-#             
-#             
-#             
-#  )))

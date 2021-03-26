@@ -2,18 +2,13 @@
 #3. FAZA: VIZUALIZACIJA PODATKOV - GRAFI
 ################################################################################################################
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#graf2 idk
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-require(ggplot2)
-require(dplyr)
-library(tidyverse) #mutate
-library(reshape2)
-library(scales) #izračun deleža
-library(wesanderson) #barva grafa
-library(reshape2) #za melt pri grafu 5
-
+#require(ggplot2) #ggplot, geom_col, scale_fill_manual, facet_grind,facet_wrap
+#require(dplyr) #group_by, top_n, desc (uredi od najvišje do najnižje ocene), select, mutate, summarise, recode, filter
+#library(tidyverse) #nisem uporabila
+#library(scales) #izračun deleža; percent
+#library(wesanderson) #barva grafa
+#library(reshape2) #nisem uporabila
+#library(tidyr) #gathe (ekvivalneten) pivot_longer
 
 #=============================================================================================================
 #1. KAKO SE JE SKOZI OLIMPISKI CIKEL SPREMINJALA VREDNOST OCEN (SKUPNE IN D). 
@@ -34,15 +29,15 @@ induvidualne_viz %>%
   #----------------------------------------------------------------------------
   #izracunamo koliko % ocene predstavlja D
   #----------------------------------------------------------------------------
-   add_column(delez =percent(induvidualne_viz$D/induvidualne_viz$koncna_ocena, accuracy = 0.01))%>%
+   add_column(delez =percent(induvidualne_viz$D/induvidualne_viz$koncna_ocena, accuracy = 0.01))%>% #iz scales
   #----------------------------------------------------------------------------
   #izberemo 10 najboljših za vsako tekmo 
   #---------------------------------------------------------------------------
-   group_by(tekma) %>%
-   top_n(10, koncna_ocena) %>%
-   arrange(desc(koncna_ocena)) %>% #desc uredi od najvišje do najnižje ocene
-   select(-c(tekmovalka, drzava, E, Pen.)) %>% #te stolpci nas ne bodo zanimali
-   mutate(ranking = 1:10)-> induvidualne_viz 
+   group_by(tekma) %>% #dplyr
+   top_n(10, koncna_ocena) %>% #dplyr
+   arrange(desc(koncna_ocena)) %>% #desc iz dplyer uredi od najvišje do najnižje ocene
+   select(-c(tekmovalka, drzava, E, Pen.)) %>% #dplyr; te stolpci nas ne bodo zanimali
+   mutate(ranking = 1:10)-> induvidualne_viz #dplyr
 #View(induvidualne_viz)
 
 
@@ -64,8 +59,9 @@ dat <- data.frame(
 #----------------------------------------------------------------------------
 dat %>%
   group_by(tekma)%>% 
-  summarise(D=mean(D), koncna_ocena =mean(koncna_ocena))%>%
-  gather("Stat", "Value",-tekma) %>%
+  summarise(D=mean(D), koncna_ocena =mean(koncna_ocena))%>% #dplyer; uporaba združevalne funkcije na dveh stolpcih
+  gather("Stat", "Value",-tekma) %>% #tidyr; pivot_longer; 
+  #združi stolpca D in koncna_ocena - imena zapiše v stolpec stat, pod value pa vrednosti.
   add_column(ranking = "povprečje")-> dat_mean
 #View(dat_mean)
 
@@ -75,7 +71,7 @@ dat %>%
 dat %>%
   group_by(tekma)%>% 
   summarise(D=median(D), koncna_ocena=median(koncna_ocena))%>%
-  gather("Stat", "Value", -tekma) %>%
+  gather("Stat", "Value", -tekma) %>% 
   add_column(ranking = "mediana")-> dat_mediana
 #View(dat_mediana)
 
@@ -93,16 +89,17 @@ dat_D <- dat %>%
 dat_graf1 <- rbind(dat_D, dat_mean, dat_mediana)
 #View(dat_graf1)
 
-value <- dat_graf1$Value
+
+value <- dat_graf1$Value #za ipis vrednosti na grafu
 #------------------------------------------------------------------------------
-#GRAF  !!!!!mal še polepšaj-kul bi blo če bi se pojavila vrednost ko dašz miško na en bar
+#GRAF
 #------------------------------------------------------------------------------
 graf1 <- ggplot(dat_graf1, aes(x = ranking, y = Value, fill = Stat)) +
   geom_col(position = "dodge") +
   #------------------------------------------------------------
   #DEKORACIJA LEGENDE
   #------------------------------------------------------------
-  scale_fill_manual(values=c("slateblue2","lightpink"),  #!!!!!!!!!!niso mi ok barve
+  scale_fill_manual(values=c("slateblue2","lightpink"),  #!niso mi ok barve
                     labels = c("D", "KONČNA OCENA")
                     )+
   #legend("topright", legend = c("D", "KONCNA OCENA"), cex = 0.75)+
@@ -160,75 +157,6 @@ print(graf1)
 
 
 
-
-
-
-
-
-
-
-#=============================================================================================================
-#2. KOLIKŠEN JE DELEŽ D V KONČNI OCENI ZA 5. NAJUSPEŠNEJŠO TEKMOVALKO NEGLEDE NA REKVIZIT?
-#______________________________________________________________________________________________________________
-
-#------------------------------------------------------------------------------
-#GRAF2-delž D v končni oceni za 5. najvišjo oceno
-#------------------------------------------------------------------------------
-#!!!!!! ne vem še kako bi to pogazala če sploh
-#=================================================================================
-#IDK WHAT THIS IS
-#===============================================================================
-induvidualne_5 <- induvidualne_viz[c(5,15,25),]
-induvidualne_5 %>%
-  select(-c(D, koncna_ocena, ranking)) ->induvidualne_graf2#%>%
-  #table() 
-#View(induvidualne_graf2)
-
-#kr neki
-#ggplot(induvidualne_graf2, aes(x=tekma, y=delez)) +
-#  geom_bar()
-
-#kr neki na kvadrat
-#plot(induvidualne_graf2$tekma, induvidualne_graf2$delez, type = "b", pch = 19, 
-#     col = "red", xlab = "x", ylab = "y")
-
-
-#okej sam se nič ne vidi- ne vem če je to to kar si želim
-#----------------------------------------------------------------------------
-bp<- ggplot(induvidualne_graf2, aes(x="", y="", fill=delez, colour=rekvizit))+
-  geom_bar(width = 1, stat = "identity")
-bp
-
-pie <- bp +
-  coord_polar("y", start=0)+
-  facet_grid(.~tekma) +
-  #OZADJE-da se znebimo sivega ozadja
-  #--------------------------------------------------------
-  theme_bw() +
-  theme(#panel.grid.major = element_blank(), #narisani krogi
-        strip.background = element_blank(),
-        panel.border = element_blank(), #okvirji okoli vakega grafka
-  #NAPISI NA OSEH
-  #---------------------------------------------------------
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-  )
- pie
-
-#----------------------------------------------------------------------------
-#lbls <- induvidualne_graf2$delez
-#pie(induvidualne_graf2, labels = lbls,
-#    main="Delež ocene D")
-
-
-
-
-
-
-
-
-
-
 #==================================================================================================================
 #3. GRAF VREDNOSTI TEŽIN Z REKVIZITOM (2018,2019)
 #__________________________________________________________________________________________________________________
@@ -241,7 +169,7 @@ pie <- bp +
 #SKRAJŠAMO IMENA TEKMOVALK ZA LEPŠI PREGLED
 #-------------------------------------------------------------------------
 wcg_graf3 <- wcg #da ne uničimo tabele
-wcg_graf3$tekmovalka <- recode(wcg_graf3$tekmovalka
+wcg_graf3$tekmovalka <- recode(wcg_graf3$tekmovalka #dplyr
                     ,"SELEZNEVA Ekaterina" = "SELEZNEVA" #KAJ JE = V KAJ ŽELIMO SPREMENITI
                     ,"ASHRAM Linoy" =  "ASHRAM" 
                     ,"AVERINA Dina" = "AVERINA D."            
@@ -302,15 +230,15 @@ print(graf3)
 #------------------------------------------------------------------------------------------------------
 #PRIPRAVA PODATKOV
 #------------------------------------------------------------------------------------------------------
-#iz tabele induvidualne_finali iberemo max, min (GLEDE NA E), mediano in povprečje
+#iz tabele induvidualne_finali izberemo max, min (GLEDE NA E), mediano in povprečje
 #neglede na tekmo, za vsak rekvizit posebaj
-induvidualne_E <- induvidualne_finali # da ne povarimo tabele
+induvidualne_E <- induvidualne_finali # da ne pokvarimo tabele
 
 #najboljši E
 #--------------------------
 max_E <- induvidualne_E %>%
   group_by(rekvizit) %>%
-  summarise(Value = max(E)) %>%
+  summarise(Value = max(E)) %>% #dplyr
   add_column(nacin = "max")
 
 #najslabši E
@@ -382,9 +310,6 @@ graf4 <- ggplot(induv_graf4, aes(x=nacin, y=Value)) +
 
 
 print(graf4)
-#!!!!!!!!!!!ni mi ok napisi max, min, povprečje, mediana
-
-
 
 
 
@@ -399,21 +324,21 @@ print(graf4)
 #PRIPRAVA PODATKOV
 #--------------------------------------------------------------------------------------------------
 induvidualne_graf5 <- induvidualne_finali %>% 
-  filter(tekmovalka == "ASHRAM Linoy") %>% 
-  select(tekma,rekvizit, E, D)
+  filter(tekmovalka == "ASHRAM Linoy") %>% #dplyr
+  select(tekma,rekvizit, E, D) #dplyr
 #View(induvidualne_graf5)
 
 #---------------------------------------------------------------------------------------------------
 #E in D moram zložit skupaj, in dodati stolpec alij je to D ali E ocena
 #---------------------------------------------------------------------------------------------------
 induv_graf5 <- induvidualne_graf5 %>% 
-  pivot_longer(c("E","D"), names_to = "ocena", values_to = "vrednosti") #pivot_longer(c(stolpci ki jih želimo združiti), samo imena stolpcev)
+  pivot_longer(c("E","D"), names_to = "ocena", values_to = "vrednosti") #tidyr, pivot_longer(c(stolpci ki jih želimo združiti), samo imena stolpcev)
 
 
 #---------------------------------------------------------------------------------------------------
 #KRAJ TEKME NAS NE ZANIMA- ta korak ni potreben
 #---------------------------------------------------------------------------------------------------
-induv_graf5$tekma <- recode(induv_graf5$tekma
+induv_graf5$tekma <- recode(induv_graf5$tekma #dplyr
                                ,"2018 Sofia" = "2018" #KAJ JE = V KAJ ŽELIMO SPREMENITI
                                ,"2019 Baku" = "2019"
                                ,"2020 Kijev" = "2020")

@@ -8,41 +8,36 @@
 #-Na zemljevid lahko dodaste še oznake območij in narišete še nekaj točk s svojimi oznakami (npr. za mesta). 
 #-Podatki o koordinatah točk naj bodo v priloženi datoteki CSV.
 
-#!!!!uredi, tistih obrob držav potem nisem uporabila-zbriši to
 
 #===========================================================================================
 #KNJIŽNICE
 #===========================================================================================
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#Preveri katere knjižnice si zares potrebovala
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-library(rgdal)
-library(rgeos)
-library(mosaic)
-library(maptools)
-library(munsell)
-library(StatMeasures)
-library(reshape2)
-library(ggplot2)
-library(tidyverse)
+#library(rgdal)
+#library(rgeos)
+#library(mosaic)
+#library(maptools)
+#library(munsell)
+#library(StatMeasures)
+#library(reshape2)
+#library(ggplot2) #map_data
+#library(tidyverse)
+#library(rvest)
+#library(magrittr)
+#library(ggmap)
+#library(stringr)
+#library(dplyr) #left_join (če v drugonavedeni tabelini tehpodatkovbo ohranil podatke iz prvonavedene tabele)
 
 # Uvozimo funkcije za pobiranje in uvoz zemljevida.
 #source('lib/uvozi.zemljevid.r')
 #source('lib/libraries.r', encoding = 'UTF-8')
 
-library(tidyverse)
-library(rvest)
-library(magrittr)
-library(ggmap)
-library(stringr)
-library(dplyr)
 
 
 #============================================================================================
 #ZEMLEVID SVETA
 #============================================================================================
-
+#iz ggplot2 uvozimo zemljevid
 map.world <- map_data("world") #, xlim=c(-120,100),ylim=c(-20,100)) 
 #potrebujem le ta del zemljevida saj v južnem delu ni nobene države s tekmovalko v finalih
 #zanemarimo japonsko k je itak kiksala na veliko
@@ -58,7 +53,7 @@ map.world <- map_data("world") #, xlim=c(-120,100),ylim=c(-20,100))
 
 # PREIMENOVANJE DRŽAV
 induv_zemljevid <- induvidualne_finali #da ne bom pokvarila tabele
-induv_zemljevid$drzava <- recode(induv_zemljevid$drzava 
+induv_zemljevid$drzava <- recode(induv_zemljevid$drzava  #dplyr
                      ,'BUL' = 'Bulgaria'
                      ,'GEO' = 'Georgia'
                      ,'ISR' = 'Israel'
@@ -74,7 +69,7 @@ induv_zemljevid$drzava <- recode(induv_zemljevid$drzava
                      #,'ROU' = 'Romania'
                      ,'SLO' = 'Slovenia'
                      #,'TUR' = 'Turkey'
-                     #,'MKD' = 'Macedonia'
+                     #,'MKD' = 'Macedonia'  
                      #,'CZE' = 'Czech Republic'
                      #,'LTU' = 'Lithuania'
                      #,'LUX' = 'Luxembourg'
@@ -96,7 +91,7 @@ induv_zemljevid$drzava <- recode(induv_zemljevid$drzava
 #===========================================================================================
 #head(map.world)
 
-# LEFT JOIN- če v induv_zemljevid ni te države bo ohranil podatke iz map.world
+# LEFT JOIN iz dplyr- če v induv_zemljevid ni te države bo ohranil podatke iz map.world
 map.world_joined <- left_join(map.world, induv_zemljevid, by = c('region' = 'drzava'))
 
 #View(map.world_joined) #long lat group order region subregion tekmovalka tekma rekvizit E D Pen. koncna_ocena
@@ -139,7 +134,7 @@ ggplot() +
 #dobila sem zemljevid, ki prikazuje katere države so bile zastopane v finalih svetovnega prvestva.
 #doala bi še:
 # 1.meje držav obarvanih z rdečo (sem)
-# 2.imena držav obarvanih z rdečo (!!!)
+# 2.imena tekmovalk
 
 
 
@@ -161,12 +156,10 @@ ggplot(map.world_joined, aes( x = long, y = lat, group = group )) +
 #*opomba: to ni glih kul ker bodo to vse ocene iz Kijeva tj. obkrožili bomo izrael in belorusijo
 
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#!!!!tukaj ne vem glih točno kaj grep dela
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#grep{base} 
 #-----------------------------------------------------------------------------------------------------
 vrstice_hoop <- map.world_joined[grep("hoop",map.world_joined$rekvizit),] %>% 
-  filter(region == "Israel")
+  filter(region == "Israel") #long,lat, group, order, region, subregion, tekmovalka, tekma, rekvizit
 vrstice_ball <- map.world_joined[grep("ball",map.world_joined$rekvizit),]%>% 
   filter(region == "Belarus")
 vrstice_clubs <- map.world_joined[grep("clubs",map.world_joined$rekvizit),]%>% 
@@ -200,15 +193,14 @@ max_ocena$najvisja_ocena <- "TRUE" #dodamo stolpec najvišja_ocena in ga nastavi
 #View(max_ocena)
 
 
-#združimo data !!!težava
+#združimo data z left_join iz dplyr
 #--------------------------------------------------------------------------------------------------------
 map.world_joined_max <- left_join(map.world_joined, max_ocena, by = c('long' = 'long','lat' = 'lat', 'group' = 'group', 'order' = 'order', 'region'= 'region', 'subregion' = 'subregion', 'tekmovalka' = 'tekmovalka', 'tekma' = 'tekma', 'rekvizit' = 'rekvizit', 'E' = 'E', 'D' = 'D', 'Pen.' = 'Pen.', 'koncna_ocena' = 'koncna_ocena',  'fill_flg' = 'fill_flg'))
 
-#kaj če moram tukajdat koncna_ocena ne najvisja ocena
 map.world_joined_max <- map.world_joined_max %>% 
-  mutate(najvisja_ocena = ifelse(is.na(najvisja_ocena),F,T))
+  mutate(najvisja_ocena = ifelse(is.na(najvisja_ocena),F,T)) #dodamo stolpec
 #is.na vrne TRUE, če je na danem mestu NA, sicer FALSE
-#ifelse(test, yes, no) test = data, če true vrne yes, če false no
+#ifelse(test, yes, no) {base} test = data, če true vrne yes, če false no
 #View(map.world_joined_max)
 
 
@@ -218,9 +210,7 @@ ggplot(map.world_joined_max, aes( x = long, y = lat, group = group)) +
   geom_polygon(aes(color = as.factor(najvisja_ocena))) +
   scale_color_manual(values = c('TRUE' = 'red', 'FALSE' = NA))
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#!!!!meje se nekaj črtkano zrišejo
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 #=====================================================================================
 #1.2.2 IZPIS IMEN NAJBOLJŠIH TEKMOVALK ZA DRŽAVO (Izrael, Rusija, Belorusija, Bulgaria)
@@ -246,12 +236,8 @@ vrstice_tekmovalka <- rbind(vrstice_tekmovalka_Rus[5000,], vrstice_tekmovalka_Bl
 #============================================================================================
 #1.3 ZEMLJEVID NAJVIŠJIH OCEN (končen)
 #===========================================================================================
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#!neobkroži mi pravilno belorusije in izraela 
-#!nočem met te legende FALSE TRUE
 #!javi mi neke napake font family
-#!ne znam dodati imen držav
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 #------------------------------------------------------------------------------------------
 #IMENA DRŽAV
@@ -309,45 +295,4 @@ print(zemljevid_najvisjih_ocen)
 
 
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#===================================================================================================
-#ZEMLJEVIDU ŽELIM DODATI IMENA DRŽAV OBARVANIH Z MODRO #https://rpubs.com/EmilOWK/209498
-#===================================================================================================
-#install.packages("choroplethrAdmin1")
-#install.packages("choroplethr")
-#install.packages("psych")
-#install.packages("grid")
-#install.packages("stringr")
-#install.packages("magrittr")
-#install.packages("psych")
-#install.packages("kirkegaard")
 
-#library(choroplethrAdmin1)
-#library(choroplethr)
-#library(ggplot2)
-#library(grid)
-#library(stringr)
-#library(magrittr)
-#library(psych)
-#library(kirkegaard)
-
-#katere države imamo
-#as.factor(map.world_joined_max$region) %>% levels()
-
-#preiimenovanje držav
-#map.world_joined_max$region <- recode(map.world_joined_max$region
- #                    ,'Bulgaria' = 'BUL'
-  #                   ,'Georgia' = 'GEO'
-   #                  ,'Israel' = 'ISR'
-    #                 ,'Italy' = 'ITA'
-     #                ,'Japan' = 'JPN'
-      #               ,'Russia' = 'RUS'
-       #              ,'Ukraine' = 'UKR'
-      #               ,'Belarus' ='BLR')
-#map.world_joined_max$region
-
-#admin1_choropleth(country.name = "bulgaria", 
- #                 df           = map.world_joined_max$region, 
-  #                legend       = "Random uniform data", 
-   #               num_colors   = 1) +
-  #geom_text(data = d_geo, aes(long, lat, label = clean_names, group = NULL), size = 2.5)

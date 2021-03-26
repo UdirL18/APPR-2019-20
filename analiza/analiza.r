@@ -26,11 +26,12 @@
 #-----------------------------------------------------------------------------------------------------
 
 
-require(ggplot2)
-require(dplyr)
-library(NbClust) #Za določanje skupin
-require(ggdendro) #za dendrograme
-require(ggrepel) #za overlapping
+#require(ggplot2) #geom_smooth, geom_segment - ravne črte med toččkami
+#require(dplyr)
+#library(NbClust) #Za določanje skupin: NbClust
+#require(ggdendro) #za dendrograme: ggdendrogram, dendro_data (izvoz podatkov v obliko dalahko delamo z ggplot), segment za povezave v dendrogramu,
+                  #theme_dendro  
+#require(ggrepel) #za overlapping
 
 
 #============================================================================================
@@ -46,8 +47,9 @@ ggplot(skupinske, aes(x = D, y = E, col = tekma)) +
   geom_point()
 
 #---------------------------------------------------------------
-# MODEL
+# MODEL 
 #--------------------------------------------------------------
+#lm{stats} - koliko je stolpec D odvisen od E
 model_skupinske_obroci_kiji <- lm(E ~ D, data=skupinske%>%filter(rekvizit == "3 obroči + 4 kiji"))
 model_skupinske_zoge <- lm(E ~ D, data=skupinske%>%filter(rekvizit == "5 žog"))
 
@@ -57,15 +59,18 @@ model_skupinske_zoge <- lm(E ~ D, data=skupinske%>%filter(rekvizit == "5 žog"))
 ggplot(skupinske, aes(x = D, y = E)) + 
   geom_point() + 
   facet_grid(.~rekvizit)+
-  geom_smooth(method=lm, formula=y~x) 
+  geom_smooth(method=lm, formula=y~x) #ggplot2
 
 
 #-----------------------------------------------------------------
 # PREDIKCIJA. Kakšna bo E ko bodo D dvignile na 32, 35
 #-----------------------------------------------------------------
 novDskupinske <- data.frame(D=c(32, 35))
+#predict {stats}
 predict(model_skupinske_obroci_kiji, novDskupinske) #5.315866 4.698013 
 predict(model_skupinske_zoge, novDskupinske) #8.735773 9.121857
+
+#tabela s stolpcem D in E
 napovedEskupinske_obroci_kiji <- novDskupinske %>% mutate(E=predict(model_skupinske_obroci_kiji, .))
 napovedEskupinske_zoge <- novDskupinske %>% mutate(E=predict(model_skupinske_zoge, .))
 
@@ -147,7 +152,7 @@ print(risba_skupinske)
 data_skupinske <- skupinske %>%
   select(E,D) %>%
   as.matrix() %>%
-  scale() #naredi standardizacijo
+  scale() #{base} naredi standardizacijo
 
 #View(data_skupinske)
 
@@ -155,8 +160,8 @@ data_skupinske <- skupinske %>%
 #----------------------------------------------------------------
 #HIERARHIČNO RAZVRŠČANJE 
 #----------------------------------------------------------------
-razdalje_skupinske <- dist(as.matrix(data_skupinske)) #na i,j tem mestu je razdalja med i-to in j-to vrstico
-model_skupinske <- hclust(razdalje_skupinske) #model
+razdalje_skupinske <- dist(as.matrix(data_skupinske)) #{stats} na i,j tem mestu je razdalja med i-to in j-to vrstico
+model_skupinske <- hclust(razdalje_skupinske) #model hierarhičnega razvrščanja; {stats}
 
 
 #malo pregledamo
@@ -195,7 +200,7 @@ model_skupinske <- hclust(razdalje_skupinske) #model
 #plot(model_skupinske, hang=-1,  cex=0.3, main="skupinske") 
 
 #2. način: S pomočjo paketa `ggdendro`
-require(ggdendro)
+#require(ggdendro)
 
 dendrogram_skupinske <- ggdendrogram(model_skupinske, labels=TRUE) + 
   theme(axis.text.y = element_blank())
@@ -206,7 +211,8 @@ print(dendrogram_skupinske)
 #----------------------------------------------------------------------
 # Pridobitev podatkov za izris z ggplot
 #----------------------------------------------------------------------
-ddata_skupinske <- dendro_data(model_skupinske, type = "rectangle") #izvozi podatke v objekt na katerem lahko uporabljamo ggplot
+#iz ggdendro uporabimo dendro_data() za izvozi podatke v objekt na katerem lahko uporabljamo ggplot
+ddata_skupinske <- dendro_data(model_skupinske, type = "rectangle") 
 #View(ddata_skupinske)
 #names(ddata_skupinske) #"segments"    "labels"      "leaf_labels" "class"
 
@@ -215,11 +221,11 @@ ddata_skupinske <- dendro_data(model_skupinske, type = "rectangle") #izvozi poda
 #-----------------------------------------------------------
 #dendrogram brez napisov držav - nepotrebno
 #-----------------------------------------------------------
-ggplot(segment(ddata_skupinske)) + 
-  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) + 
+ggplot(segment(ddata_skupinske)) + #segment iz ggdendro za povezave v dendrogramu
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) + #ggplot2- ravnačrta med dvema točkama
   #coord_flip() + 
   #scale_y_reverse(expand = c(0.2, 0)) + 
-  theme_dendro()
+  theme_dendro() #ggdendro
 
 
 #################################################
@@ -260,12 +266,12 @@ print(dendrogg_skupinske)
 #-------------------------------
 # določanje skupin
 #--------------------------------
-p3 <- cutree(model_skupinske, k=3)
+p3 <- cutree(model_skupinske, k=3) #{stats}
 #p3   #1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 3 3 3 3 3 2 3 3 3 3 2 2
     #po vrstnem redu iz tabele skupinske nam pove v katero skupino gre posamezna država
 
-##################################################################
-skupinske$drzava <- recode(skupinske$drzava 
+#----------------------------------------------------------------------
+skupinske$drzava <- recode(skupinske$drzava  #dplyr
                           ,'Bulgaria' = 'BUL' 
                           ,'Israel' = 'ISR' 
                           ,'Italy' = 'ITA' 
@@ -289,7 +295,7 @@ grupiranje_skupinske3 <- skupinske %>%
   ggplot(aes(x=D, y=E, col=p3, shape = tekma)) +
   guides(color = FALSE)+ #legende za barvo ne potrebujem
   geom_point() +
-  geom_text_repel( # da se ne prekrivajo imena
+  geom_text_repel( #iz ggrepel, da se ne prekrivajo imena
     aes(label=drzava),
     size=3,
     color='black',
@@ -348,7 +354,7 @@ print(risba_ind)
 data_ind <- wcg %>%
   select(DB,DA) %>%
   as.matrix() %>%
-  scale() #naredi standardizacijo
+  scale() #{base} naredi standardizacijo
 
 #View(data_ind)
 
@@ -356,8 +362,8 @@ data_ind <- wcg %>%
 #----------------------------------------------------------------
 #RAZVRŠČANJE 
 #----------------------------------------------------------------
-razdalje_ind <- dist(as.matrix(data_ind)) #na i,j tem mestu je razdalja med i-to in j-to vrstico
-model_ind <- hclust(razdalje_ind) #model
+razdalje_ind <- dist(as.matrix(data_ind)) #{stats} na i,j tem mestu je razdalja med i-to in j-to vrstico
+model_ind <- hclust(razdalje_ind) #{stats} model
 
 
 #----------------------------------------------------------------------
@@ -400,7 +406,7 @@ print(dendrogg_ind)
 #--------------------------------------------
 #DOLOČANJE ŠTEVILA SKUPIN
 #--------------------------------------------
-library(NbClust)
+#library(NbClust)
 #-----------------------------------------------------------------
 # euclidean
 #-----------------------------------------------------------------
@@ -544,7 +550,7 @@ print(grupiranje_ind5)
 #-------------------------------------------------------------------------
 #View(ecg)
 
-#za vsak rekvizit bomo zapisali katero mestoje zasedla tekmovalka, potem bomo za vsako tekmovalko izbrali najvišjo uvrstitev
+#za vsak rekvizit bomo zapisali katero mesto je zasedla tekmovalka, potem bomo za vsako tekmovalko izbrali najvišjo uvrstitev
 induvidualne_rekviziti <- ecg %>% #da ne pokvarimo podatkov
   group_by(rekvizit) %>% #morda ne bo potrebno
   mutate(mesto=as.numeric(c(1:25))) #%>% #ker imamo podatke že urejene
@@ -563,9 +569,9 @@ induvidualne_rekviziti <- ecg %>% #da ne pokvarimo podatkov
 #mediana po rekvizitih
 medians <- induvidualne_rekviziti %>%
   group_by(rekvizit) %>%
-  summarize(median = median(koncna_ocena, na.rm = T)) 
-#View(medians) #ball 21.65, clubs	21.75, hoop 21.00, ribbon	19.30
-
+  summarize(median = median(koncna_ocena, na.rm = T)) #na.rm - odstrani na vrednosti 
+#summarize izračuna eno vrednost za vsak rekvizit: ball 21.65, clubs	21.75, hoop 21.00, ribbon	19.30
+#View(medians) #tabela z dvema stolpcamain 4 vrsticam: rekvizit median
 
 #------
 #graf
@@ -600,7 +606,7 @@ data_rekviziti <- ecg %>%
   scale()
 
 #----------------------------------------------------------------------------------
-modelK_rekviziti <- kmeans(data_rekviziti, 3)
+modelK_rekviziti <- kmeans(data_rekviziti, 3) #{stats}
 
 # Razporeditev v skupine
 modelK_rekviziti$cluster
@@ -635,7 +641,7 @@ modelK_rekviziti$cluster
 #--------------------------------------------------------------
 # KONČNI GRAF SKUPIN PO REKVIZITIH
 #--------------------------------------------------------------
-require('ggrepel') #za overlapping
+#require('ggrepel') #za overlapping
 
 ecg$tekmovalka <- recode(ecg$tekmovalka
                                 #KAJ JE = V KAJ ŽELIMO SPREMENITI

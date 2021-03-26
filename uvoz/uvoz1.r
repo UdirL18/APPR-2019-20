@@ -20,10 +20,13 @@
 #===========================================================================================================
 #KNJIŽNICE
 #===========================================================================================================
-library(dplyr)
-library(tidyr) #za funkciji gather() in spread()
-library(readr) #read_csv,
-library(naniar) #replace_with_na_at
+#library(dplyr) #omogoča enostavnejše in preglednejše operacije na razpredelnicah. 
+              #Rezultat prejšnega izraza se postavi za prvi argument funkcije naslednjega izraza
+              #,ki ga ni potrebno navajati. Vedno vrne novo razpredelnico - ne spremninja obstoječe.
+              #uporabili za funkciju group_by in ungroup
+#library(tidyr) #za funkciji gather() 
+#library(readr) #read_csv - podatki so ločeni z ,
+#library(naniar) #replace_with_na_at
 
 
 #==============================================================================================================
@@ -32,6 +35,7 @@ library(naniar) #replace_with_na_at
 sl <- locale("sl", decimal_mark=".", grouping_mark=";") 
 
 #SOFIA
+#read_csv iz knjižnice readr, za branje csv datotekločenih z ,
 #---------------------------------------------------------------------------------------------------------------
 sofia_hoop<- read_csv("podatki/sofia_hoop.csv", skip = 7, locale=locale(encoding="Windows-1250"))[,c(3,6,9,10,12:14)]
 colnames(sofia_hoop) <- c("tekmovalka","drzava","DB", "DA", "EA", "ET", "Pen.")
@@ -90,7 +94,7 @@ colnames(kijev_ribbon) <- c("tekmovalka","drzava","E", "D", "Pen.", "koncna_ocen
 
 #SOFIA
 #-------------------------------------------------------------------------------------------------------------
-sofia_hoop$rekvizit<-"hoop" 
+sofia_hoop$rekvizit<-"hoop"  #bolj elegantno z dplyr sofia_hoop %>% mutate(rekvizit = "hoop")
 sofia_hoop$tekma<-"2018 Sofia"
 
 sofia_ball$rekvizit<-"ball" 
@@ -182,6 +186,7 @@ induvidualne <- rbind(ecg, wcg_D_E)
 #===============================================================================================
 #SAMO "FINALISTKE"
 #===============================================================================================
+#uporabimo dplyr za funkcijo group_by in ungroup()
 finali_kijev <- ecg %>%
   group_by(tekma) %>%
   group_by(rekvizit) %>% 

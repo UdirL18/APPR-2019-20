@@ -1,11 +1,12 @@
 #UVOZ PODATKOV IZ SPLETA
+#=================================================================================================================
 
 #KNJIŽNICE------------------------------------------------------------------------------------------------------
-require(tidyr)
-require(readr)
-require(dplyr)
-require(rvest) #za spletne strani, omogoča premikanje po značkah
-require(XML)
+#require(tidyr) #replace_na
+#require(readr) # read_csv
+#require(dplyr) #rename, select, mutate, rename,recode
+#require(rvest) #za spletne strani, omogoča premikanje po značkah. read_html, html_nodes
+#require(XML) #je na koncu nismuporabila
 #---------------------------------------------------------------------------------------------------------------
 
 #BAKU
@@ -26,10 +27,10 @@ tabela_baku_skupinske %>%
   html_nodes(xpath = "//table[@class='wikitable sortable']") %>% 
   .[[9]] %>% 
   html_table() %>% 
-  rename(drzava = 2, E = 3, D = 4, koncna_ocena = 6) %>% 
-  replace_na(list(Pen. = 0)) %>% #NA v stolpcu Pen. spremenim v 0
-  select(-1) %>% #izbrišem prvi stolpec(uvrstitev) ker to lahko izračunamo sami
-  mutate(rekvizit = "5 žog") %>%
+  rename(drzava = 2, E = 3, D = 4, koncna_ocena = 6) %>% #dplyer
+  replace_na(list(Pen. = 0)) %>% #NA v stolpcu Pen. spremenim v 0; iz tidyr  #list()ker imamo v pen številke in NA
+  select(-1) %>% #izbrišem prvi stolpec(uvrstitev) ker to lahko izračunamo sami; iz dplyer
+  mutate(rekvizit = "5 žog") %>% #dplyer
   mutate(tekma = "2019 Baku") -> tabela_baku_skupinske_zoge
   #View() %>%
   #sapply(class) # rank:integer, drzava: caracter, E: num, D num, pen.:num, total:num 
@@ -59,8 +60,8 @@ wcg_baku_skupinske <- rbind(tabela_baku_skupinske_kiji_obroci, tabela_baku_skupi
 #View(wcg_baku_skupinske)
 
 
-
-
+#==================================================================================================================
+#CSV podatki (na spletu jih v html obliki še ni bilo)
 #==================================================================================================================
 #KIJEV
 sl <- locale("sl", decimal_mark=".", grouping_mark=";") 
@@ -69,7 +70,7 @@ kijev_zoge <-
   read_csv("podatki/kyiv_RG_rezultati.csv", skip = 153, n_max = 6, locale=locale(encoding="Windows-1250"))[,c(3:7)]
 
 kijev_zoge %>% 
-  rename(drzava = 1, E = 2, D = 3, Pen.= 4, koncna_ocena = 5) %>% #preimenujemo stolpce
+  rename(drzava = 1, E = 2, D = 3, Pen.= 4, koncna_ocena = 5) %>% #preimenujemo stolpce; dplyer
   mutate(rekvizit = "5 žog") %>% #dodamo dva stolpca
   mutate(tekma = "2020 Kijev") -> kijev_zoge
 
@@ -99,7 +100,7 @@ skupinske <- rbind(wcg_baku_skupinske, ecg_kijev_skupinske)
 
 
 #ni mi všeč ker mam nekje države poimenovane z kraticam nekje pa s celim imenom
-skupinske$drzava <- recode(skupinske$drzava 
+skupinske$drzava <- recode(skupinske$drzava    #dplyer; KAJ JE = V KAJ ŽELIMO SPREMENITI
                      ,'BUL' = 'Bulgaria'
                      ,'ISR' = 'Israel'
                      ,'ITA' = 'Italy'
